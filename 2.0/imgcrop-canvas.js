@@ -1,6 +1,6 @@
 /*
- * 图像剪裁组件
- * 基于canvas
+ * 鍥惧儚鍓缁勪欢
+ * 鍩轰簬canvas
  */
 KISSY.add(function (S) {
 	var $ = S.all;
@@ -175,7 +175,7 @@ KISSY.add(function (S) {
 		_handleMouseMove : function (e) {
 			var self = this;
 			e.preventDefault();
-			//清除选择
+			//娓呴櫎閫夋嫨
 			window.getSelection ? window.getSelection().removeAllRanges() : document.selection.empty();
 
 			var iMouseX = self.iMouseX;
@@ -347,7 +347,7 @@ KISSY.add(function (S) {
 
 			self.canvas.css({
 				top : (self.container.height() - self.canvasH) / 2,
-				left : (self.container.width() - self.canvasW) / 2,
+				left : (self.container.width() - self.canvasW) / 2
 			});
 		},
 		getInfo : function () {
@@ -356,4 +356,9 @@ KISSY.add(function (S) {
 		move : function (diffX, diffY) {}
 	});
 	return ImgCrop;
+}, {
+	attach : false
 });
+
+
+//http://developer.yahoo.com/yui/docs/YAHOO.widget.ImageCropper.html

@@ -66,8 +66,8 @@ KISSY.add('gallery/imgcrop/1.0/dragable', function (S) {
             this._x = e.clientX - this.Drag.offsetLeft;
             this._y = e.clientY - this.Drag.offsetTop;
             //记录margin
-            this._marginLeft = parseInt(DOM.css(this.Drag, 'margin-left'), 10);
-            this._marginTop = parseInt(DOM.css(this.Drag, 'margin-top'), 10);
+            this._marginLeft = parseInt(DOM.css(this.Drag, 'margin-left'), 10) || this._marginLeft;
+            this._marginTop = parseInt(DOM.css(this.Drag, 'margin-top'), 10) || this._marginTop;
             //mousemove时移动 mouseup时停止
             Event.on(document, "mousemove", this.move, this);
             Event.on(document, "mouseup", this.stop, this);
