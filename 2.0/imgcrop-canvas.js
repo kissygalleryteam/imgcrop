@@ -23,8 +23,8 @@ KISSY.add(function (S) {
 		this.bDrag = [false, false, false, false]; // drag statuses
 		this.bDragAll = false; // drag whole selection
 	}
-	S.augment(Selection,{
-		draw : function(ctx){
+	S.augment(Selection, {
+		draw : function (ctx) {
 			ctx.strokeStyle = '#fff';
 			ctx.lineWidth = 1;
 			ctx.strokeRect(this.x, this.y, this.w, this.h);
@@ -36,7 +36,7 @@ KISSY.add(function (S) {
 			ctx.fillRect(this.x + this.w - this.iCSize[2], this.y + this.h - this.iCSize[2], this.iCSize[2] * 2, this.iCSize[2] * 2);
 			ctx.fillRect(this.x - this.iCSize[3], this.y + this.h - this.iCSize[3], this.iCSize[3] * 2, this.iCSize[3] * 2);
 		},
-		getInfo : function(){
+		getInfo : function () {
 			return {
 				x : this.x,
 				y : this.y,
@@ -121,7 +121,7 @@ KISSY.add(function (S) {
 				self._rejustSize(image.width, image.height, self.container.width(), self.container.height());
 				self._drawScene();
 				self._bind();
-				self.fire('imgload',{
+				self.fire('imgload', {
 					width : image.width,
 					height : image.height
 				});
@@ -133,25 +133,25 @@ KISSY.add(function (S) {
 			this.canvas.on('mousedown', this._handleMouseDown, this);
 			$(document).on('mouseup', this._handleMouseUp, this);
 		},
-		_build : function(){
+		_build : function () {
 			var self = this;
 			var areaWidth = self.get('areaWidth');
 			var areaHeight = self.get('areaHeight');
-			
+
 			self.container.css({
-				position:"relative",
+				position : "relative",
 				width : areaWidth || self.container.width(),
 				height : areaHeight || self.container.height()
 			});
-			
+
 			//init canvas temp size
 			self.canvas.css({
 				position : 'absolute'
 			});
-			
+
 			self.container.append(self.canvas);
 		},
-		_drawScene : function(){
+		_drawScene : function () {
 			var self = this;
 			var ctx = self.ctx;
 			var width = self.canvasW;
@@ -171,13 +171,13 @@ KISSY.add(function (S) {
 			// draw selection
 			theSelection.draw(ctx);
 		},
-		
-		_handleMouseMove : function(e){
+
+		_handleMouseMove : function (e) {
 			var self = this;
 			e.preventDefault();
 			//Çå³ýÑ¡Ôñ
 			window.getSelection ? window.getSelection().removeAllRanges() : document.selection.empty();
-			
+
 			var iMouseX = self.iMouseX;
 			var iMouseY = self.iMouseY;
 			var theSelection = self.theSelection;
@@ -187,7 +187,9 @@ KISSY.add(function (S) {
 
 			// in case of drag of whole selector
 			if (theSelection.bDragAll) {
-				self.fire("drag",{e:e});
+				self.fire("drag", {
+					e : e
+				});
 				theSelection.x = Math.min(Math.max(iMouseX - theSelection.px, 0), self.canvasW - theSelection.w);
 				theSelection.y = Math.min(Math.max(iMouseY - theSelection.py, 0), self.canvasH - theSelection.h);
 			}
@@ -225,34 +227,45 @@ KISSY.add(function (S) {
 			}
 
 			// in case of dragging of resize cubes
-			var iFW, iFH, iFX, iFY;
+			var iFW,
+			iFH,
+			iFX,
+			iFY;
 			if (theSelection.bDrag[0]) {
 				iFX = iMouseX - theSelection.px;
 				iFY = iMouseY - theSelection.py;
 				iFW = theSelection.w + theSelection.x - iFX;
 				iFH = theSelection.h + theSelection.y - iFY;
-				self.fire("resize",{e:e});
+				self.fire("resize", {
+					e : e
+				});
 			}
 			if (theSelection.bDrag[1]) {
 				iFX = theSelection.x;
 				iFY = iMouseY - theSelection.py;
 				iFW = iMouseX - theSelection.px - iFX;
 				iFH = theSelection.h + theSelection.y - iFY;
-				self.fire("resize",{e:e});
+				self.fire("resize", {
+					e : e
+				});
 			}
 			if (theSelection.bDrag[2]) {
 				iFX = theSelection.x;
 				iFY = theSelection.y;
 				iFW = iMouseX - theSelection.px - iFX;
 				iFH = iMouseY - theSelection.py - iFY;
-				self.fire("resize",{e:e});
+				self.fire("resize", {
+					e : e
+				});
 			}
 			if (theSelection.bDrag[3]) {
 				iFX = iMouseX - theSelection.px;
 				iFY = theSelection.y;
 				iFW = theSelection.w + theSelection.x - iFX;
 				iFH = iMouseY - theSelection.py - iFY;
-				self.fire("resize",{e:e});
+				self.fire("resize", {
+					e : e
+				});
 			}
 
 			//min
@@ -267,7 +280,7 @@ KISSY.add(function (S) {
 
 			self._drawScene();
 		},
-		_handleMouseDown : function(e){
+		_handleMouseDown : function (e) {
 			var self = this;
 			var iMouseX = self.iMouseX;
 			var iMouseY = self.iMouseY;
@@ -308,7 +321,7 @@ KISSY.add(function (S) {
 				}
 			}
 		},
-		_handleMouseUp : function(e){
+		_handleMouseUp : function (e) {
 			var theSelection = this.theSelection;
 			theSelection.bDragAll = false;
 			for (i = 0; i < 4; i++) {
@@ -319,24 +332,25 @@ KISSY.add(function (S) {
 		},
 		_rejustSize : function (imgW, imgH, conW, conH) {
 			var self = this;
-            var new_width, new_height;
-            if ((imgW / conW) > (imgH / conH)) {
-                new_width = Math.min(conW, imgW);
-                new_height = new_width * imgH / imgW;
-            } else {
-                new_height = Math.min(conH, imgH);
-                new_width = new_height * imgW / imgH;
-            }
-			
+			var new_width,
+			new_height;
+			if ((imgW / conW) > (imgH / conH)) {
+				new_width = Math.min(conW, imgW);
+				new_height = new_width * imgH / imgW;
+			} else {
+				new_height = Math.min(conH, imgH);
+				new_width = new_height * imgW / imgH;
+			}
+
 			self.canvas[0].width = self.canvasW = new_width;
 			self.canvas[0].height = self.canvasH = new_height;
-			
+
 			self.canvas.css({
-				top:(self.container.height() - self.canvasH)/2,
-				left:(self.container.width() - self.canvasW)/2,
+				top : (self.container.height() - self.canvasH) / 2,
+				left : (self.container.width() - self.canvasW) / 2,
 			});
 		},
-		getInfo : function(){
+		getInfo : function () {
 			return this.theSelection.getInfo();
 		},
 		move : function (diffX, diffY) {}
