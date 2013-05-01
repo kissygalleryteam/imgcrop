@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>图片剪裁组件</title>
+<link href="http://a.tbcdn.cn/s/kissy/1.2.0/css/base.css" rel="stylesheet"/>
+<script src="http://a.tbcdn.cn/??s/kissy/1.2.0/kissy-min.js"></script>
+<link href="http://docs.kissyui.com/1.2/docs/html/_static/demo/button/assets/custombutton.css" rel="stylesheet"/>
+
+<link rel="stylesheet" href="../imgcrop.css"/>
+<style type="text/css">
+#areaId{
+	border:1px solid #333;
+}
+.content{
+	display:block;
+	width:910px;
+	margin:20px auto;
+}
+table{
+	margin:10px 0;
+}
+input{
+	width:251px
+}
+</style>
+</head>
+
+<body style="height:1000px">
+
+<div class="content">
+	<div>
+		<label>图片地址：</label><input value="http://img03.taobaocdn.com/bao/uploaded/i3/10672022783751654/T1BPhRXuhdXXXXXXXX_!!0-item_pic.jpg" id="idPicUrl"/>
+	</div>
+	<table>
+		<tr>
+			<th width="300">原图</th>
+			<th width="300">预览区</th>
+		</tr>
+		<tr>
+			<td><div id="areaId"></div></td>
+			<td><div style="width: 300px; height: 300px;" id="viewDiv"></div></td>
+		</tr>
+	</table>
+
+	<textarea id="info" rows="5" cols="60" style="display:block"></textarea>
+</div>
+<script>
+if(KISSY.Config.debug == true){
+	KISSY.config({
+	  packages:[
+		{
+		  name:"gallery",
+		  tag:"20111220",
+		  path:"../../../../",
+		  charset:"utf-8"
+		}
+	  ]
+	});
+}
+</script>
+<script>
+    KISSY.use('gallery/imgcrop/1.0/index, button', function (S, ImgCrop, Button) {
+        var imgcrop = new ImgCrop({
+            url:"http://img02.taobaocdn.com/bao/uploaded/i2/12396021951093657/T1gaGhXzpcXXXXXXXX_!!0-item_pic.jpg_300x300.jpg",
+            areaEl:'#areaId', //图片的容器
+            preview:'#viewDiv',//不配置就没有
+            areaWidth:300, //不配置默认取容器宽度
+            areaHeight:300, //不配置默认取容器高度
+            resize:true, //是否可以resize
+            opacity:50, //选取框外面透明度
+			color:'#000', //选取框外面颜色
+            scale:false //是否固定比例
+        });
+		
+		imgcrop.on('imgload drag resize', function(){
+            S.all("#info").val(S.JSON.stringify(imgcrop.getInfo()));
+        });
+		
+		var b1 = new Button({
+			content : '换图片',
+			prefixCls: "goog-",
+			render: ".content"
+		});
+		b1.render();
+		b1.on('click', function(){
+			imgcrop.set('url', S.all("#idPicUrl").val());
+		});
+    });
+</script>
+
+</body>
+</html>
