@@ -6,43 +6,174 @@ KISSY.add(function (S) {
 	var $ = S.all;
 
 	// define Selection constructor
-	function Selection(x, y, w, h) {
-		this.x = x; // initial positions
-		this.y = y;
-		this.w = w; // and size
-		this.h = h;
+	function Selection() {
+		Selection.superclass.constructor.apply(this, arguments);
 
-		this.px = 0; // extra variables to dragging calculations
-		this.py = 0;
-
-		this.csize = 5; // resize cubes size
+		this.csize = 4; // resize cubes size
 		this.csizeh = 6; // resize cubes size (on hover)
 
 		this.bHover = [false, false, false, false]; // hover statuses
 		this.iCSize = [this.csize, this.csize, this.csize, this.csize]; // resize cubes sizes
-		this.bDrag = [false, false, false, false]; // drag statuses
+		this.bDrag  = [false, false, false, false]; // drag statuses
 		this.bDragAll = false; // drag whole selection
 	}
-	S.augment(Selection, {
+	Selection.EVENT = {
+		DRAG : "drag",
+		RESIZE : "resize"
+	};
+	Selection.ATTRS = {
+		x : {
+			value : 0
+		},
+		y : {
+			value : 0
+		},
+		w : {
+			value : 50
+		},
+		h : {
+			value : 50
+		},
+		px : {
+			value : 0
+		},
+		py : {
+			value : 0
+		},
+		minWidth : {
+			value : 50
+		},
+		minHeight : {
+			value : 50
+		},
+		resizable : {
+			value : true
+		}
+	};
+	S.extend(Selection, S.Base, {
 		draw : function (ctx) {
 			ctx.strokeStyle = '#fff';
 			ctx.lineWidth = 1;
-			ctx.strokeRect(this.x, this.y, this.w, this.h);
+			ctx.strokeRect(this.get('x'), this.get('y'), this.get('w'), this.get('h'));
 
-			// draw resize cubes
-			ctx.fillStyle = '#fff';
-			ctx.fillRect(this.x - this.iCSize[0], this.y - this.iCSize[0], this.iCSize[0] * 2, this.iCSize[0] * 2);
-			ctx.fillRect(this.x + this.w - this.iCSize[1], this.y - this.iCSize[1], this.iCSize[1] * 2, this.iCSize[1] * 2);
-			ctx.fillRect(this.x + this.w - this.iCSize[2], this.y + this.h - this.iCSize[2], this.iCSize[2] * 2, this.iCSize[2] * 2);
-			ctx.fillRect(this.x - this.iCSize[3], this.y + this.h - this.iCSize[3], this.iCSize[3] * 2, this.iCSize[3] * 2);
+			if(this.get('resizable')){
+				// draw resize cubes
+				ctx.fillStyle = '#fff';
+				ctx.canvas.style.cursor = this.cursor;
+				ctx.fillRect(this.get('x') - this.iCSize[0], this.get('y') - this.iCSize[0], this.iCSize[0] * 2, this.iCSize[0] * 2);
+				ctx.fillRect(this.get('x') + this.get('w') - this.iCSize[1], this.get('y') - this.iCSize[1], this.iCSize[1] * 2, this.iCSize[1] * 2);
+				ctx.fillRect(this.get('x') + this.get('w') - this.iCSize[2], this.get('y') + this.get('h') - this.iCSize[2], this.iCSize[2] * 2, this.iCSize[2] * 2);
+				ctx.fillRect(this.get('x') - this.iCSize[3], this.get('y') + this.get('h') - this.iCSize[3], this.iCSize[3] * 2, this.iCSize[3] * 2);
+			}
 		},
 		getInfo : function () {
 			return {
-				x : this.x,
-				y : this.y,
-				w : this.w,
-				h : this.h
+				x : this.get('x'),
+				y : this.get('y'),
+				w : this.get('w'),
+				h : this.get('h')
 			}
+		},
+		_resetCubes : function(){
+			var self = this;
+			for (i = 0; i < self.bHover.length; i++) {
+				self.bHover[i] = false;
+				self.iCSize[i] = self.csize;
+			}
+		},
+		_hovering : function(iMouseX, iMouseY){
+			var self = this;
+			
+			//reset cubes
+			self._resetCubes();
+			
+			self.cursor = 'default';
+			
+			if (iMouseX > self.get('x') - self.csizeh && iMouseX < self.get('x') + self.csizeh &&
+				iMouseY > self.get('y') - self.csizeh && iMouseY < self.get('y') + self.csizeh) {
+
+				self.bHover[0] = true;
+				self.iCSize[0] = self.csizeh;
+				
+			}else if (iMouseX > self.get('x') + self.get('w') - self.csizeh && iMouseX < self.get('x') + self.get('w') + self.csizeh &&
+				iMouseY > self.get('y') - self.csizeh && iMouseY < self.get('y') + self.csizeh) {
+
+				self.bHover[1] = true;
+				self.iCSize[1] = self.csizeh;
+				
+			}else if(iMouseX > self.get('x') + self.get('w') - self.csizeh && iMouseX < self.get('x') + self.get('w') + self.csizeh &&
+				iMouseY > self.get('y') + self.get('h') - self.csizeh && iMouseY < self.get('y') + self.get('h') + self.csizeh) {
+
+				self.bHover[2] = true;
+				self.iCSize[2] = self.csizeh;
+				
+			}else if (iMouseX > self.get('x') - self.csizeh && iMouseX < self.get('x') + self.csizeh &&
+				iMouseY > self.get('y') + self.get('h') - self.csizeh && iMouseY < self.get('y') + self.get('h') + self.csizeh) {
+
+				self.bHover[3] = true;
+				self.iCSize[3] = self.csizeh;
+				
+			}else if (iMouseX > self.get('x') + self.csizeh && iMouseX < self.get('x') + self.get('w') - self.csizeh &&
+				iMouseY > self.get('y') + self.csizeh && iMouseY < self.get('y') + self.get('h') - self.csizeh) {
+				
+				self.cursor = 'move';
+				
+			}
+			
+		},
+		
+		resize : function(iMouseX, iMouseY){
+			var self = this;
+			
+			var iFW, iFH, iFX, iFY;
+			if (self.bDrag[0]) {
+				iFX = iMouseX - self.get('px');
+				iFY = iMouseY - self.get('py');
+				iFW = self.get('w') + self.get('x') - iFX;
+				iFH = self.get('h') + self.get('y') - iFY;
+			}
+			if (self.bDrag[1]) {
+				iFX = self.get('x');
+				iFY = iMouseY - self.get('py');
+				iFW = iMouseX - self.get('px') - iFX;
+				iFH = self.get('h') + self.get('y') - iFY;
+			}
+			if (self.bDrag[2]) {
+				iFX = self.get('x');
+				iFY = self.get('y');
+				iFW = iMouseX - self.get('px') - iFX;
+				iFH = iMouseY - self.get('py') - iFY;
+			}
+			if (self.bDrag[3]) {
+				iFX = iMouseX - self.get('px');
+				iFY = self.get('y');
+				iFW = self.get('w') + self.get('x') - iFX;
+				iFH = iMouseY - self.get('py') - iFY;
+			}
+
+			//min
+			if (iFW > self.get('minWidth')) {
+				self.set({
+					w : iFW,
+					x : iFX
+				});
+			}
+			if (iFH > self.get('minHeight')) {
+				self.set({
+					h : iFH,
+					y : iFY
+				});
+			}
+			
+			self.fire(Selection.EVENT.RESIZE);
+		},
+		move : function (diffX, diffY) {
+			var self = this;
+			self.set({
+				x : diffX,
+				y : diffY
+			});
+			self.fire(Selection.EVENT.DRAG);
 		}
 	});
 
@@ -52,11 +183,13 @@ KISSY.add(function (S) {
 		this.canvas = $('<canvas>');
 		this.ctx = this.canvas[0].getContext('2d');
 		this.image = new Image();
-		this.iMouseX = 0;
-		this.iMouseY = 0;
-		this.theSelection = null;
 		this._init();
 	}
+	ImgCrop.EVENT = {
+		DRAG : "drag",
+		RESIZE : "resize",
+		IMGLOAD : "imgload"
+	};
 	ImgCrop.ATTRS = {
 		areaEl : {
 			value : ''
@@ -76,7 +209,7 @@ KISSY.add(function (S) {
 		initHeight : {
 			value : 100
 		},
-		resize : {
+		resizable : {
 			value : true
 		},
 		scale : {
@@ -85,11 +218,8 @@ KISSY.add(function (S) {
 		opacity : {
 			value : 50
 		},
-		color : {
+		maskColor : {
 			value : '#000'
-		},
-		min : {
-			value : false
 		},
 		minHeight : {
 			value : 100
@@ -117,21 +247,79 @@ KISSY.add(function (S) {
 			var image = self.image;
 			image.onload = function () {
 				self._build();
-				self.theSelection = new Selection(self.get('initialXY')[0], self.get('initialXY')[1], self.get('initWidth'), self.get('initHeight'));
+				self._createSelection();
 				self._rejustSize(image.width, image.height, self.container.width(), self.container.height());
 				self._drawScene();
 				self._bind();
-				self.fire('imgload', {
-					width : image.width,
-					height : image.height
-				});
+				self.fire(ImgCrop.EVENT.IMGLOAD, self.getOriginalSize());
 			}
 			image.src = self.get('url');
 		},
 		_bind : function () {
-			$(document).on('mousemove', this._handleMouseMove, this);
-			this.canvas.on('mousedown', this._handleMouseDown, this);
-			$(document).on('mouseup', this._handleMouseUp, this);
+			var self = this;
+			$(document).on('mousemove', self._handleMouseMove, self);
+			self.canvas.on('mousedown', self._handleMouseDown, self);
+			$(document).on('mouseup', self._handleMouseUp, self);
+			self.on("*Change", self._doAttrChange, self);
+		},
+		_unBind : function(){
+			var self = this;
+			$(document).detach('mousemove', self._handleMouseMove, self);
+			self.canvas.detach('mousedown', self._handleMouseDown, self);
+			$(document).detach('mouseup', self._handleMouseUp, self);
+			self.detach("*Change", self._doAttrChange, self);
+		},
+		_doAttrChange : function(e){
+			var self = this;
+
+			S.each(e.attrName, function(attr, index){
+				var value = e.newVal[index];
+				switch(attr){
+					case 'initWidth':
+						self.theSelection.set('w', value);
+						break;
+					case 'initHeight':
+						self.theSelection.set('h', value);
+						break;
+					case 'initialXY':
+						self.theSelection.set('x', value[0]);
+						self.theSelection.set('y', value[1]);
+						break;
+					default:
+						self.theSelection.set(attr, value);
+				}
+			});
+			
+		},
+		_createSelection : function(){
+			var self = this;
+			self.theSelection = new Selection({
+				x : self.get('initialXY')[0],
+				y : self.get('initialXY')[1],
+				w : self.get('initWidth'),
+				h : self.get('initHeight'),
+				minWidth : self.get('minWidth'),
+				minHeight : self.get('minHeight'),
+				resizable : self.get('resizable')
+			});
+			
+			self.theSelection.detach("drag", _doDrag).on("drag", _doDrag);
+			self.theSelection.detach("resize", _doResize).on("resize", _doResize);
+			self.theSelection.detach("*Change", _doChange).on("*Change", _doChange);
+			
+			function _doDrag(){
+				self.fire(ImgCrop.EVENT.DRAG);
+				self._drawScene();
+			}
+			
+			function _doResize(){
+				self.fire(ImgCrop.EVENT.RESIZE);
+				self._drawScene();
+			}
+			
+			function _doChange(e){
+				self._drawScene();
+			}
 		},
 		_build : function () {
 			var self = this;
@@ -140,33 +328,43 @@ KISSY.add(function (S) {
 
 			self.container.css({
 				position : "relative",
-				width : areaWidth || self.container.width(),
+				width  : areaWidth || self.container.width(),
 				height : areaHeight || self.container.height()
 			});
+			
+			self.canvas.detach("selectstart mousedown", _doPreventDefault).on("selectstart mousedown", _doPreventDefault);
+			
+			function _doPreventDefault(e){
+				e.preventDefault();
+				return false;
+			}
 
-			//init canvas temp size
-			self.canvas.css({
+			self.container.append(self.canvas.css({
 				position : 'absolute'
-			});
-
-			self.container.append(self.canvas);
+			}));
 		},
 		_drawScene : function () {
 			var self = this;
 			var ctx = self.ctx;
-			var width = self.canvasW;
-			var height = self.canvasH;
 			var theSelection = self.theSelection;
-			ctx.clearRect(0, 0, width, height); // clear canvas
+			
+			var selection = {
+				x : theSelection.get('x'),
+				y : theSelection.get('y'),
+				w : theSelection.get('w'),
+				h : theSelection.get('h')
+			};
+			// clear canvas
+			ctx.clearRect(0, 0, self.canvasW, self.canvasH); 
 			// draw source image
-			ctx.drawImage(self.image, 0, 0, width, height);
+			ctx.drawImage(self.image, 0, 0, self.canvasW, self.canvasH);
 
 			// and make it darker
 			ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-			ctx.fillRect(0, 0, width, theSelection.y);
-			ctx.fillRect(0, theSelection.y, theSelection.x, theSelection.h);
-			ctx.fillRect(theSelection.x + theSelection.w, theSelection.y, width - theSelection.x - theSelection.w, theSelection.h);
-			ctx.fillRect(0, theSelection.y + theSelection.h, width, height - theSelection.y - theSelection.h);
+			ctx.fillRect(0, 0, self.canvasW, selection.y);
+			ctx.fillRect(0, selection.y, selection.x, selection.h);
+			ctx.fillRect(selection.x + selection.w, selection.y, self.canvasW - selection.x - selection.w, selection.h);
+			ctx.fillRect(0, selection.y + selection.h, self.canvasW, self.canvasH - selection.y - selection.h);
 
 			// draw selection
 			theSelection.draw(ctx);
@@ -174,151 +372,69 @@ KISSY.add(function (S) {
 
 		_handleMouseMove : function (e) {
 			var self = this;
-			e.preventDefault();
+			e.halt();
 			//清除选择
 			window.getSelection ? window.getSelection().removeAllRanges() : document.selection.empty();
 
-			var iMouseX = self.iMouseX;
-			var iMouseY = self.iMouseY;
 			var theSelection = self.theSelection;
 			var canvasOffset = self.canvas.offset();
-			iMouseX = Math.min(Math.max(e.pageX - canvasOffset.left, 0), self.canvasW);
-			iMouseY = Math.min(Math.max(e.pageY - canvasOffset.top, 0), self.canvasH);
+			var iMouseX = self.iMouseX = Math.min(Math.max(e.pageX - canvasOffset.left, 0), self.canvasW);
+			var iMouseY = self.iMouseY = Math.min(Math.max(e.pageY - canvasOffset.top, 0), self.canvasH);
 
 			// in case of drag of whole selector
 			if (theSelection.bDragAll) {
-				self.fire("drag", {
-					e : e
-				});
-				theSelection.x = Math.min(Math.max(iMouseX - theSelection.px, 0), self.canvasW - theSelection.w);
-				theSelection.y = Math.min(Math.max(iMouseY - theSelection.py, 0), self.canvasH - theSelection.h);
-			}
-
-			//reset cubes
-			for (i = 0; i < 4; i++) {
-				theSelection.bHover[i] = false;
-				theSelection.iCSize[i] = theSelection.csize;
+				var diffX = Math.min(Math.max(iMouseX - theSelection.get('px'), 0), self.canvasW - theSelection.get('w'));
+				var diffY = Math.min(Math.max(iMouseY - theSelection.get('py'), 0), self.canvasH - theSelection.get('h'));
+				return self.theSelection.move(diffX, diffY);
 			}
 
 			// hovering over resize cubes
-			if (iMouseX > theSelection.x - theSelection.csizeh && iMouseX < theSelection.x + theSelection.csizeh &&
-				iMouseY > theSelection.y - theSelection.csizeh && iMouseY < theSelection.y + theSelection.csizeh) {
-
-				theSelection.bHover[0] = true;
-				theSelection.iCSize[0] = theSelection.csizeh;
-			}
-			if (iMouseX > theSelection.x + theSelection.w - theSelection.csizeh && iMouseX < theSelection.x + theSelection.w + theSelection.csizeh &&
-				iMouseY > theSelection.y - theSelection.csizeh && iMouseY < theSelection.y + theSelection.csizeh) {
-
-				theSelection.bHover[1] = true;
-				theSelection.iCSize[1] = theSelection.csizeh;
-			}
-			if (iMouseX > theSelection.x + theSelection.w - theSelection.csizeh && iMouseX < theSelection.x + theSelection.w + theSelection.csizeh &&
-				iMouseY > theSelection.y + theSelection.h - theSelection.csizeh && iMouseY < theSelection.y + theSelection.h + theSelection.csizeh) {
-
-				theSelection.bHover[2] = true;
-				theSelection.iCSize[2] = theSelection.csizeh;
-			}
-			if (iMouseX > theSelection.x - theSelection.csizeh && iMouseX < theSelection.x + theSelection.csizeh &&
-				iMouseY > theSelection.y + theSelection.h - theSelection.csizeh && iMouseY < theSelection.y + theSelection.h + theSelection.csizeh) {
-
-				theSelection.bHover[3] = true;
-				theSelection.iCSize[3] = theSelection.csizeh;
-			}
+			self.theSelection._hovering(iMouseX, iMouseY);
 
 			// in case of dragging of resize cubes
-			var iFW,
-			iFH,
-			iFX,
-			iFY;
-			if (theSelection.bDrag[0]) {
-				iFX = iMouseX - theSelection.px;
-				iFY = iMouseY - theSelection.py;
-				iFW = theSelection.w + theSelection.x - iFX;
-				iFH = theSelection.h + theSelection.y - iFY;
-				self.fire("resize", {
-					e : e
-				});
-			}
-			if (theSelection.bDrag[1]) {
-				iFX = theSelection.x;
-				iFY = iMouseY - theSelection.py;
-				iFW = iMouseX - theSelection.px - iFX;
-				iFH = theSelection.h + theSelection.y - iFY;
-				self.fire("resize", {
-					e : e
-				});
-			}
-			if (theSelection.bDrag[2]) {
-				iFX = theSelection.x;
-				iFY = theSelection.y;
-				iFW = iMouseX - theSelection.px - iFX;
-				iFH = iMouseY - theSelection.py - iFY;
-				self.fire("resize", {
-					e : e
-				});
-			}
-			if (theSelection.bDrag[3]) {
-				iFX = iMouseX - theSelection.px;
-				iFY = theSelection.y;
-				iFW = theSelection.w + theSelection.x - iFX;
-				iFH = iMouseY - theSelection.py - iFY;
-				self.fire("resize", {
-					e : e
-				});
-			}
-
-			//min
-			if (iFW > self.get('minWidth')) {
-				theSelection.w = iFW;
-				theSelection.x = iFX;
-			}
-			if (iFH > self.get('minHeight')) {
-				theSelection.h = iFH;
-				theSelection.y = iFY;
-			}
-
-			self._drawScene();
+			self.theSelection.resize(iMouseX, iMouseY);
+			
 		},
 		_handleMouseDown : function (e) {
 			var self = this;
-			var iMouseX = self.iMouseX;
-			var iMouseY = self.iMouseY;
 			var theSelection = self.theSelection;
 			var canvasOffset = self.canvas.offset();
-			iMouseX = Math.floor(e.pageX - canvasOffset.left);
-			iMouseY = Math.floor(e.pageY - canvasOffset.top);
+			var iMouseX = self.iMouseX = Math.floor(e.pageX - canvasOffset.left);
+			var iMouseY = self.iMouseY = Math.floor(e.pageY - canvasOffset.top);
 
-			theSelection.px = iMouseX - theSelection.x;
-			theSelection.py = iMouseY - theSelection.y;
-
+			var px, py;
 			if (theSelection.bHover[0]) {
-				theSelection.px = iMouseX - theSelection.x;
-				theSelection.py = iMouseY - theSelection.y;
+				px = iMouseX - theSelection.get('x');
+				py = iMouseY - theSelection.get('y');
+			}else if (theSelection.bHover[1]) {
+				px = iMouseX - theSelection.get('x') - theSelection.get('w');
+				py = iMouseY - theSelection.get('y');
+			}else if (theSelection.bHover[2]) {
+				px = iMouseX - theSelection.get('x') - theSelection.get('w');
+				py = iMouseY - theSelection.get('y') - theSelection.get('h');
+			}else if (theSelection.bHover[3]) {
+				px = iMouseX - theSelection.get('x');
+				py = iMouseY - theSelection.get('y') - theSelection.get('h');
+			}else{
+				px = iMouseX - theSelection.get('x');
+				py = iMouseY - theSelection.get('y');
 			}
-			if (theSelection.bHover[1]) {
-				theSelection.px = iMouseX - theSelection.x - theSelection.w;
-				theSelection.py = iMouseY - theSelection.y;
-			}
-			if (theSelection.bHover[2]) {
-				theSelection.px = iMouseX - theSelection.x - theSelection.w;
-				theSelection.py = iMouseY - theSelection.y - theSelection.h;
-			}
-			if (theSelection.bHover[3]) {
-				theSelection.px = iMouseX - theSelection.x;
-				theSelection.py = iMouseY - theSelection.y - theSelection.h;
-			}
+			
+			theSelection.set({
+				px : px,
+				py : py
+			});
 
-			if (iMouseX > theSelection.x + theSelection.csizeh && iMouseX < theSelection.x + theSelection.w - theSelection.csizeh &&
-				iMouseY > theSelection.y + theSelection.csizeh && iMouseY < theSelection.y + theSelection.h - theSelection.csizeh) {
+			if (iMouseX > theSelection.get('x') + theSelection.csizeh && 
+				iMouseX < theSelection.get('x') + theSelection.get('w') - theSelection.csizeh &&
+				iMouseY > theSelection.get('y') + theSelection.csizeh && 
+				iMouseY < theSelection.get('y') + theSelection.get('h') - theSelection.csizeh) {
 
 				theSelection.bDragAll = true;
 			}
 
 			for (i = 0; i < 4; i++) {
-				if (theSelection.bHover[i]) {
-					theSelection.bDrag[i] = true;
-				}
+				theSelection.bDrag[i] = theSelection.bHover[i];
 			}
 		},
 		_handleMouseUp : function (e) {
@@ -327,13 +443,14 @@ KISSY.add(function (S) {
 			for (i = 0; i < 4; i++) {
 				theSelection.bDrag[i] = false;
 			}
-			theSelection.px = 0;
-			theSelection.py = 0;
+			theSelection.set({
+				px : 0,
+				py : 0
+			});
 		},
 		_rejustSize : function (imgW, imgH, conW, conH) {
-			var self = this;
-			var new_width,
-			new_height;
+			var self = this, new_width, new_height;
+			
 			if ((imgW / conW) > (imgH / conH)) {
 				new_width = Math.min(conW, imgW);
 				new_height = new_width * imgH / imgW;
@@ -342,18 +459,51 @@ KISSY.add(function (S) {
 				new_width = new_height * imgW / imgH;
 			}
 
-			self.canvas[0].width = self.canvasW = new_width;
-			self.canvas[0].height = self.canvasH = new_height;
+			self.canvas[0].width = self.canvasW = Math.floor(new_width);
+			self.canvas[0].height = self.canvasH = Math.floor(new_height);
 
 			self.canvas.css({
 				top : (self.container.height() - self.canvasH) / 2,
 				left : (self.container.width() - self.canvasW) / 2
 			});
 		},
-		getInfo : function () {
-			return this.theSelection.getInfo();
+		reset : function(){
+			this._init();
 		},
-		move : function (diffX, diffY) {}
+		destroy : function(){
+			this._unBind();
+			this.canvas.remove();
+			this.theSelection = null;
+		},
+		setCropCoords : function(x, y, w, h){
+			this.set({
+				initialXY : [x, y],
+				initWidth : w,
+				initHeight: h
+			});
+		},
+		//The top, left, height, width and image url of the image being cropped
+		getCropCoords : function(){
+			return S.merge(this.theSelection.getInfo(),{
+				url : this.get('url'),
+				r : this.image.width / this.canvasW
+			});
+		},
+		getOriginalSize : function(){
+			return {
+				width : this.image.width,
+				height : this.image.height
+			};
+		},
+		getDisplaySize : function(){
+			return {
+				width : this.canvasW,
+				height : this.canvasH
+			};
+		},
+		toString : function(){
+			return S.JSON.stringify(this.getCropCoords());
+		}
 	});
 	return ImgCrop;
 }, {

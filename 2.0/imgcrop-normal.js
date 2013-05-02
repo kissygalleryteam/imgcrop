@@ -44,9 +44,6 @@ KISSY.add(function (S, Resize, Drag) {
 		color : {
 			value : '#000'
 		},
-		min : {
-			value : false
-		},
 		minHeight : {
 			value : 100
 		},
@@ -153,7 +150,7 @@ KISSY.add(function (S, Resize, Drag) {
 			if (self.get('resize')) {
 				self._resize = new Resize(self.el, {
 						Max : true,
-						Min : self.get("min"),
+						Min : true,
 						Scale : self.get("scale"),
 						Ratio : self.get("ratio"),
 						minWidth : self.get("minWidth"),
@@ -323,7 +320,7 @@ KISSY.add(function (S, Resize, Drag) {
 		 * 剪裁区域图片信息
 		 * @return {Object}
 		 */
-		getInfo : function () {
+		getCropCoords : function () {
 			var info = this._getPos();
 			var r = parseInt(this._tempImg.width, 10) / parseInt(this._layBase.width, 10);
 			var result = {
@@ -332,7 +329,7 @@ KISSY.add(function (S, Resize, Drag) {
 				w : info.w,
 				h : info.h,
 				r : r,
-				src : this.get("url")
+				url : this.get("url")
 			};
 			return result;
 		},

@@ -10,16 +10,12 @@
 	<![endif]-->
 	<style>
 		body {
-			background-color:#74b1d1;
+			background-color:#4B9B6B;
 		}
 		.header {
-			background-color:#212121;
-			box-shadow: 0 -1px 2px #111111;
-			display:block;
+			background-color:#333;
 			height:70px;
 			line-height:70px;
-		}
-		.header h2{
 			font-size:22px;
 			text-indent: 30px;
 			color:#fff;
@@ -45,7 +41,7 @@ if(KISSY.Config.debug == true){
 	  packages:[
 		{
 		  name:"gallery",
-		  tag:"201305013",
+		  tag:"20130501",
 		  path:"../../../../",
 		  charset:"utf-8"
 		}
@@ -53,22 +49,26 @@ if(KISSY.Config.debug == true){
 	});
 }
 </script>
+<!--
 <script src="../build/index.js"></script>
+-->
 <script>
 KISSY.use('gallery/imgcrop/2.0/index', function(S, ImgCrop){
 	var $ = S.all;
-	var crop = new ImgCrop({
+	crop = new ImgCrop({
 		areaEl : "#J_CropBox",
 		initialXY : [10,10],
 		initWidth : 200,
 		initHeight : 200,
+		minHeight : 100,
+		minWidth : 100,
 		areaWidth:500, //不配置默认取容器宽度
         areaHeight:500, //不配置默认取容器高度
 		url : 'http://img01.taobaocdn.com/imgextra/i1/14888019145001501/T1_iIPXl8dXXXXXXXX_!!855984888-0-pix.jpg'
 	});
 	
 	crop.on('imgload drag resize', function(){
-		$('#J_InfoBox').text(S.JSON.stringify(crop.getInfo(), null, 4));
+		$('#J_InfoBox').text(S.JSON.stringify(crop.getCropCoords(), null, 4));
 	});
 });
 </script>
