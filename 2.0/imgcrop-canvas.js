@@ -5,7 +5,7 @@
 KISSY.add(function (S) {
 	var $ = S.all;
 
-	// define Selection constructor
+	//选择对象
 	function Selection() {
 		Selection.superclass.constructor.apply(this, arguments);
 
@@ -19,7 +19,8 @@ KISSY.add(function (S) {
 	}
 	Selection.EVENT = {
 		DRAG : "drag",
-		RESIZE : "resize"
+		RESIZE : "resize",
+		HOVER : "hover"
 	};
 	Selection.ATTRS = {
 		x : {
@@ -48,17 +49,26 @@ KISSY.add(function (S) {
 		},
 		resizable : {
 			value : true
+		},
+		borderColor : {
+			value : '#fff'
+		},
+		cubesColor : {
+			value : '#fff'
+		},
+		constraint : {
+			value : [10000, 10000]
 		}
 	};
 	S.extend(Selection, S.Base, {
 		draw : function (ctx) {
-			ctx.strokeStyle = '#fff';
+			ctx.strokeStyle = this.get('borderColor');
 			ctx.lineWidth = 1;
 			ctx.strokeRect(this.get('x'), this.get('y'), this.get('w'), this.get('h'));
 
 			if(this.get('resizable')){
 				// draw resize cubes
-				ctx.fillStyle = '#fff';
+				ctx.fillStyle = this.get('cubesColor');
 				ctx.canvas.style.cursor = this.cursor;
 				ctx.fillRect(this.get('x') - this.iCSize[0], this.get('y') - this.iCSize[0], this.iCSize[0] * 2, this.iCSize[0] * 2);
 				ctx.fillRect(this.get('x') + this.get('w') - this.iCSize[1], this.get('y') - this.iCSize[1], this.iCSize[1] * 2, this.iCSize[1] * 2);
@@ -89,35 +99,42 @@ KISSY.add(function (S) {
 			
 			self.cursor = 'default';
 			
+			var mouseenter = false;
+			
 			if (iMouseX > self.get('x') - self.csizeh && iMouseX < self.get('x') + self.csizeh &&
 				iMouseY > self.get('y') - self.csizeh && iMouseY < self.get('y') + self.csizeh) {
 
-				self.bHover[0] = true;
+				mouseenter = self.bHover[0] = true;
 				self.iCSize[0] = self.csizeh;
 				
 			}else if (iMouseX > self.get('x') + self.get('w') - self.csizeh && iMouseX < self.get('x') + self.get('w') + self.csizeh &&
 				iMouseY > self.get('y') - self.csizeh && iMouseY < self.get('y') + self.csizeh) {
 
-				self.bHover[1] = true;
+				mouseenter = self.bHover[1] = true;
 				self.iCSize[1] = self.csizeh;
 				
 			}else if(iMouseX > self.get('x') + self.get('w') - self.csizeh && iMouseX < self.get('x') + self.get('w') + self.csizeh &&
 				iMouseY > self.get('y') + self.get('h') - self.csizeh && iMouseY < self.get('y') + self.get('h') + self.csizeh) {
 
-				self.bHover[2] = true;
+				mouseenter = self.bHover[2] = true;
 				self.iCSize[2] = self.csizeh;
 				
 			}else if (iMouseX > self.get('x') - self.csizeh && iMouseX < self.get('x') + self.csizeh &&
 				iMouseY > self.get('y') + self.get('h') - self.csizeh && iMouseY < self.get('y') + self.get('h') + self.csizeh) {
 
-				self.bHover[3] = true;
+				mouseenter = self.bHover[3] = true;
 				self.iCSize[3] = self.csizeh;
 				
 			}else if (iMouseX > self.get('x') + self.csizeh && iMouseX < self.get('x') + self.get('w') - self.csizeh &&
 				iMouseY > self.get('y') + self.csizeh && iMouseY < self.get('y') + self.get('h') - self.csizeh) {
 				
 				self.cursor = 'move';
+				mouseenter = true;
 				
+			}
+			
+			if(mouseenter){
+				self.fire(Selection.EVENT.HOVER);
 			}
 			
 		},
@@ -131,41 +148,33 @@ KISSY.add(function (S) {
 				iFY = iMouseY - self.get('py');
 				iFW = self.get('w') + self.get('x') - iFX;
 				iFH = self.get('h') + self.get('y') - iFY;
-			}
-			if (self.bDrag[1]) {
+			}else if (self.bDrag[1]) {
 				iFX = self.get('x');
 				iFY = iMouseY - self.get('py');
 				iFW = iMouseX - self.get('px') - iFX;
 				iFH = self.get('h') + self.get('y') - iFY;
-			}
-			if (self.bDrag[2]) {
+			}else if (self.bDrag[2]) {
 				iFX = self.get('x');
 				iFY = self.get('y');
 				iFW = iMouseX - self.get('px') - iFX;
 				iFH = iMouseY - self.get('py') - iFY;
-			}
-			if (self.bDrag[3]) {
+			}else if (self.bDrag[3]) {
 				iFX = iMouseX - self.get('px');
 				iFY = self.get('y');
 				iFW = self.get('w') + self.get('x') - iFX;
 				iFH = iMouseY - self.get('py') - iFY;
 			}
-
-			//min
-			if (iFW > self.get('minWidth')) {
+			
+			if(S.inArray(true, self.bDrag)){
 				self.set({
-					w : iFW,
-					x : iFX
-				});
-			}
-			if (iFH > self.get('minHeight')) {
-				self.set({
-					h : iFH,
+					w : Math.min(Math.max(self.get('minWidth'), iFW), self.get('constraint')[0]),
+					x : iFX,
+					h : Math.min(Math.max(self.get('minHeight'), iFH), self.get('constraint')[1]),
 					y : iFY
 				});
-			}
+				self.fire(Selection.EVENT.RESIZE);
+			}		
 			
-			self.fire(Selection.EVENT.RESIZE);
 		},
 		move : function (diffX, diffY) {
 			var self = this;
@@ -176,6 +185,86 @@ KISSY.add(function (S) {
 			self.fire(Selection.EVENT.DRAG);
 		}
 	});
+	
+	//预览对象
+	function Preview(){
+		Preview.superclass.constructor.apply(this, arguments);
+		this.canvas = $('<canvas>');
+		this.ctx = this.canvas[0].getContext('2d');
+		this.container = $(this.get('previewEl'));
+		this._init();
+	}
+	Preview.ATTRS = {
+		previewEl : {
+			value : ''
+		},
+		viewHeight : {
+			value : 300
+		},
+		viewWidth : {
+			value : 300
+		},
+		image : {
+			value : null
+		}
+	};
+	S.extend(Preview, S.Base, {
+		_init : function(){
+			this._build();
+		},
+		_build : function(){
+			var self = this;
+			var viewWidth = self.get('viewWidth');
+			var viewHeight = self.get('viewHeight');
+
+			self.container.css({
+				position : "relative",
+				width  : viewWidth || self.container.width(),
+				height : viewHeight || self.container.height()
+			});
+
+			self.container.html('').append(self.canvas.css({
+				position : 'absolute'
+			}));
+			
+			self._rejustSize();
+		},
+		_rejustSize : function(){
+			var self = this;
+			var image = self.get('image'), viewWidth = self.get('viewWidth'), viewHeight = self.get('viewHeight');
+			var imgW = image.width, imgH = image.height, new_width, new_height;
+			
+			if ((imgW / viewWidth) > (imgH / viewHeight)) {
+				new_width = Math.min(viewWidth, imgW);
+				new_height = new_width * imgH / imgW;
+			} else {
+				new_height = Math.min(viewHeight, imgH);
+				new_width = new_height * imgW / imgH;
+			}
+
+			self.canvas[0].width = self.canvasW = Math.floor(new_width);
+			self.canvas[0].height = self.canvasH = Math.floor(new_height);
+
+			self.canvas.css({
+				top : (self.container.height() - self.canvasH) / 2,
+				left : (self.container.width() - self.canvasW) / 2
+			});
+		},
+		draw : function(x, y, w, h, r){
+			var self = this;
+			// clear canvas
+			self.ctx.clearRect(0, 0, self.canvasW, self.canvasH);
+			var image = self.get('image');
+			
+			var preW = Math.floor(w*r*self.canvasW/image.width);
+			var preH = Math.floor(h*r*self.canvasH/image.height);
+			self.ctx.drawImage(image, Math.floor(x*r), Math.floor(y*r), Math.floor(w*r), Math.floor(h*r), 0, 0, preW, preH);
+		},
+		destroy : function(){
+			this.canvas.remove();
+		}
+	});
+	
 
 	function ImgCrop() {
 		ImgCrop.superclass.constructor.apply(this, arguments);
@@ -183,11 +272,16 @@ KISSY.add(function (S) {
 		this.canvas = $('<canvas>');
 		this.ctx = this.canvas[0].getContext('2d');
 		this.image = new Image();
+		this.preview = null;
 		this._init();
 	}
 	ImgCrop.EVENT = {
 		DRAG : "drag",
+		START_DRAG : "startdrag",
+		END_DRAG : "enddrag",
 		RESIZE : "resize",
+		START_RESIZE : "startresize",
+		END_RESIZE : "endresize",
 		IMGLOAD : "imgload"
 	};
 	ImgCrop.ATTRS = {
@@ -227,7 +321,13 @@ KISSY.add(function (S) {
 		minWidth : {
 			value : 100
 		},
-		preview : {
+		borderColor : {
+			value : '#fff'
+		},
+		cubesColor : {
+			value : '#fff'
+		},
+		previewEl : {
 			value : ''
 		},
 		viewHeight : {
@@ -247,10 +347,11 @@ KISSY.add(function (S) {
 			var image = self.image;
 			image.onload = function () {
 				self._build();
-				self._createSelection();
 				self._rejustSize(image.width, image.height, self.container.width(), self.container.height());
+				self._createSelection();
 				self._drawScene();
 				self._bind();
+				self._createPreview();
 				self.fire(ImgCrop.EVENT.IMGLOAD, self.getOriginalSize());
 			}
 			image.src = self.get('url');
@@ -285,11 +386,34 @@ KISSY.add(function (S) {
 						self.theSelection.set('x', value[0]);
 						self.theSelection.set('y', value[1]);
 						break;
-					default:
+					case 'borderColor':
+					case 'cubesColor':
+					case 'resizable':
+					case 'minWidth':
+					case 'minHeight':
 						self.theSelection.set(attr, value);
+						break;
+					default :
+						self.reset();
 				}
 			});
 			
+		},
+		_createPreview : function(){
+			var self = this;
+			//不需预览
+			if(!S.one(self.get('previewEl'))) return;
+			
+			self.preview = new Preview({
+				image : self.image,
+				previewEl : self.get('previewEl'),
+				viewHeight : self.get('viewHeight'),
+				viewWidth : self.get('viewWidth')
+			});
+			self.on("imgload resize drag", function(){
+				var Coords = self.getCropCoords();
+				self.preview.draw(Coords.x, Coords.y, Coords.w, Coords.h, Coords.r);
+			});
 		},
 		_createSelection : function(){
 			var self = this;
@@ -300,11 +424,14 @@ KISSY.add(function (S) {
 				h : self.get('initHeight'),
 				minWidth : self.get('minWidth'),
 				minHeight : self.get('minHeight'),
-				resizable : self.get('resizable')
+				resizable : self.get('resizable'),
+				borderColor : self.get('borderColor'),
+				constraint : [self.canvasW, self.canvasH]
 			});
 			
 			self.theSelection.detach("drag", _doDrag).on("drag", _doDrag);
 			self.theSelection.detach("resize", _doResize).on("resize", _doResize);
+			self.theSelection.detach("hover", _doHover).on("hover", _doHover);
 			self.theSelection.detach("*Change", _doChange).on("*Change", _doChange);
 			
 			function _doDrag(){
@@ -314,6 +441,10 @@ KISSY.add(function (S) {
 			
 			function _doResize(){
 				self.fire(ImgCrop.EVENT.RESIZE);
+				self._drawScene();
+			}
+			
+			function _doHover(){
 				self._drawScene();
 			}
 			
@@ -339,23 +470,21 @@ KISSY.add(function (S) {
 				return false;
 			}
 
-			self.container.append(self.canvas.css({
+			self.container.html('').append(self.canvas.css({
 				position : 'absolute'
 			}));
 		},
 		_drawScene : function () {
 			var self = this;
-			var ctx = self.ctx;
-			var theSelection = self.theSelection;
-			
 			var selection = {
-				x : theSelection.get('x'),
-				y : theSelection.get('y'),
-				w : theSelection.get('w'),
-				h : theSelection.get('h')
+				x : self.theSelection.get('x'),
+				y : self.theSelection.get('y'),
+				w : self.theSelection.get('w'),
+				h : self.theSelection.get('h')
 			};
+			var ctx = self.ctx;
 			// clear canvas
-			ctx.clearRect(0, 0, self.canvasW, self.canvasH); 
+			ctx.clearRect(0, 0, self.canvasW, self.canvasH);
 			// draw source image
 			ctx.drawImage(self.image, 0, 0, self.canvasW, self.canvasH);
 
@@ -367,12 +496,11 @@ KISSY.add(function (S) {
 			ctx.fillRect(0, selection.y + selection.h, self.canvasW, self.canvasH - selection.y - selection.h);
 
 			// draw selection
-			theSelection.draw(ctx);
+			self.theSelection.draw(ctx);
 		},
 
 		_handleMouseMove : function (e) {
 			var self = this;
-			e.halt();
 			//清除选择
 			window.getSelection ? window.getSelection().removeAllRanges() : document.selection.empty();
 
@@ -436,17 +564,23 @@ KISSY.add(function (S) {
 			for (i = 0; i < 4; i++) {
 				theSelection.bDrag[i] = theSelection.bHover[i];
 			}
+			
+			self.fire(ImgCrop.EVENT.START_DRAG);
+			self.fire(ImgCrop.EVENT.START_RESIZE);
 		},
 		_handleMouseUp : function (e) {
-			var theSelection = this.theSelection;
+			var self = this;
+			var theSelection = self.theSelection;
 			theSelection.bDragAll = false;
-			for (i = 0; i < 4; i++) {
+			for (i = 0; i < theSelection.bDrag.length; i++) {
 				theSelection.bDrag[i] = false;
 			}
 			theSelection.set({
 				px : 0,
 				py : 0
 			});
+			self.fire(ImgCrop.EVENT.END_DRAG);
+			self.fire(ImgCrop.EVENT.END_RESIZE);
 		},
 		_rejustSize : function (imgW, imgH, conW, conH) {
 			var self = this, new_width, new_height;
@@ -474,6 +608,9 @@ KISSY.add(function (S) {
 			this._unBind();
 			this.canvas.remove();
 			this.theSelection = null;
+			if(this.preview){
+				this.preview.destroy();
+			}
 		},
 		setCropCoords : function(x, y, w, h){
 			this.set({

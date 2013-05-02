@@ -32,7 +32,7 @@ KISSY.add(function (S, Resize, Drag) {
 		initHeight : {
 			value : 100
 		},
-		resize : {
+		resizable : {
 			value : true
 		},
 		scale : {
@@ -50,7 +50,7 @@ KISSY.add(function (S, Resize, Drag) {
 		minWidth : {
 			value : 100
 		},
-		preview : {
+		previewEl : {
 			value : ''
 		},
 		viewHeight : {
@@ -79,7 +79,7 @@ KISSY.add(function (S, Resize, Drag) {
 		_render : function () {
 			var self = this;
 			self.area = $(self.get('areaEl')).css('overflow', 'hidden').html('');
-			self.preview = $(self.get('preview')).html('');
+			self.preview = $(self.get('previewEl')).html('');
 			self.area.css('position', 'relative');
 			self.wrap = $('<div class="crop-wrap">');
 			self.wrap.append(self._createDragEl()).appendTo(self.area);
@@ -95,7 +95,7 @@ KISSY.add(function (S, Resize, Drag) {
 		_createDragEl : function () {
 			var self = this;
 			var _el = self.el = $('<div class="crop">');
-			if (self.get("resize")) {
+			if (self.get("resizable")) {
 				S.each(['lt', 't', 'rt', 'r', 'rb', 'b', 'lb', 'l'], function (id) {
 					_el.append($('<div class="crop-point point-' + id + '">'));
 				});
@@ -147,7 +147,7 @@ KISSY.add(function (S, Resize, Drag) {
 		_initResize : function () {
 			var self = this;
 			//设置缩放
-			if (self.get('resize')) {
+			if (self.get('resizable')) {
 				self._resize = new Resize(self.el, {
 						Max : true,
 						Min : true,
@@ -223,7 +223,7 @@ KISSY.add(function (S, Resize, Drag) {
 		_setPreview : function () {
 			var self = this;
 			//设置预览对象
-			var preWrap = S.one(self.get("preview")); //预览对象
+			var preWrap = S.one(self.get("previewEl")); //预览对象
 			if (preWrap) {
 				self._view = new Image();
 				self._view.style.position = "absolute";
@@ -303,14 +303,14 @@ KISSY.add(function (S, Resize, Drag) {
 		 * 当前显示图片的尺寸
 		 * @return {*}
 		 */
-		getCurSize : function () {
-			return this._getSize(this._tempImg.width, this._tempImg.height, this.get("areaWidth"), this.get("areaHeight"));
+		getDisplaySize : function () {
+			return this._getSize(this._tempImg.width, this._tempImg.height,this.get("areaWidth"),this.get("areaHeight"));
 		},
 		/**
 		 * 原始图片的尺寸
 		 * @return {Object}
 		 */
-		getOriSize : function () {
+		getOriginalSize : function () {
 			return {
 				width : parseInt(this._tempImg.width, 10),
 				height : parseInt(this._tempImg.height, 10)
@@ -340,7 +340,7 @@ KISSY.add(function (S, Resize, Drag) {
 		 * @param w
 		 * @param h
 		 */
-		resetCrop : function (x, y, w, h) {
+		setCropCoords : function (x, y, w, h) {
 			this.el.css({
 				width : w,
 				height : h,
@@ -364,6 +364,12 @@ KISSY.add(function (S, Resize, Drag) {
 					delete this[a];
 				}
 			}
+		},
+		reset : function(){
+			this._init();
+		},
+		toString : function(){
+			return S.JSON.stringify(this.getCropCoords());
 		}
 	});
 	return ImgCrop;

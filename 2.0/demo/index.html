@@ -27,21 +27,28 @@
 			height:500px;
 			float:left;
 		}
+		.preview{
+			overflow:hidden;
+			float:left;
+			width:300px;
+			height:300px;
+		}
 	</style>
 </head>
 <body>
-	<div class="header">
-		<h2>image crop</h2>
-	</div>
-	<div id="J_CropBox" class="container"></div>
-	<textarea id="J_InfoBox" class="infobox"></textarea>
+<div class="header">
+	<h2>image crop</h2>
+</div>
+<div id="J_CropBox" class="container"></div>
+<div id="J_PrevBox" class="preview"></div>
+<textarea id="J_InfoBox" class="infobox"></textarea>
 <script>
 if(KISSY.Config.debug == true){
 	KISSY.config({
 	  packages:[
 		{
 		  name:"gallery",
-		  tag:"20130501",
+		  tag:"20130512",
 		  path:"../../../../",
 		  charset:"utf-8"
 		}
@@ -64,11 +71,14 @@ KISSY.use('gallery/imgcrop/2.0/index', function(S, ImgCrop){
 		minWidth : 100,
 		areaWidth:500, //不配置默认取容器宽度
         areaHeight:500, //不配置默认取容器高度
+		previewEl : "#J_PrevBox",
 		url : 'http://img01.taobaocdn.com/imgextra/i1/14888019145001501/T1_iIPXl8dXXXXXXXX_!!855984888-0-pix.jpg'
 	});
 	
 	crop.on('imgload drag resize', function(){
 		$('#J_InfoBox').text(S.JSON.stringify(crop.getCropCoords(), null, 4));
+		S.log(S.JSON.stringify(crop.getOriginalSize()));
+		S.log(S.JSON.stringify(crop.getDisplaySize()));
 	});
 });
 </script>
