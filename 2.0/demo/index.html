@@ -76,7 +76,7 @@ KISSY.use('gallery/imgcrop/2.0/index', function(S, ImgCrop){
 	});
 	
 	crop.on('imgload drag resize', function(){
-		$('#J_InfoBox').text(S.JSON.stringify(crop.getCropCoords(), null, 4));
+		$('#J_InfoBox').text(crop.toString(4));
 		S.log(S.JSON.stringify(crop.getOriginalSize()));
 		S.log(S.JSON.stringify(crop.getDisplaySize()));
 	});

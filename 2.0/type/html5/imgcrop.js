@@ -21,7 +21,8 @@ KISSY.add(function (S, Preview, Selection) {
 		RESIZE : "resize",
 		START_RESIZE : "startresize",
 		END_RESIZE : "endresize",
-		IMGLOAD : "imgload"
+		IMGLOAD : "imgload",
+		HOVER : "hover"
 	};
 	ImgCrop.ATTRS = {
 		areaEl : {
@@ -97,11 +98,12 @@ KISSY.add(function (S, Preview, Selection) {
 		},
 		_bind : function () {
 			var self = this;
-			//$(document).on('mousemove', self._handleMouseMove, self);
-			//self.canvas.on('mousedown', self._handleMouseDown, self);
-			//$(document).on('mouseup', self._handleMouseUp, self);
+			$(document).on('mousemove', self._handleMouseMove, self);
+			self.canvas.on('mousedown', self._handleMouseDown, self);
+			$(document).on('mouseup', self._handleMouseUp, self);
 			self.on("*Change", self._doAttrChange, self);
 
+			//增加触摸事件
 			self.canvas.on('touchstart', self._handleTouchStart, self);
 			self.canvas.on('touchmove', self._handleTouchMove, self);
 			self.canvas.on('touchend', self._handleTouchEnd, self);
@@ -176,24 +178,7 @@ KISSY.add(function (S, Preview, Selection) {
 					constraint : [self.canvasW, self.canvasH]
 				});
 
-			self.theSelection.detach("drag", _doDrag).on("drag", _doDrag);
-			self.theSelection.detach("resize", _doResize).on("resize", _doResize);
-			self.theSelection.detach("hover", _doHover).on("hover", _doHover);
 			self.theSelection.detach("*Change", _doChange).on("*Change", _doChange);
-
-			function _doDrag() {
-				self.fire(ImgCrop.EVENT.DRAG);
-				self._drawScene();
-			}
-
-			function _doResize() {
-				self.fire(ImgCrop.EVENT.RESIZE);
-				self._drawScene();
-			}
-
-			function _doHover() {
-				self._drawScene();
-			}
 
 			function _doChange(e) {
 				self._drawScene();
@@ -257,17 +242,21 @@ KISSY.add(function (S, Preview, Selection) {
 			var iMouseY = self.iMouseY = Math.min(Math.max(e.pageY - canvasOffset.top, 0), self.canvasH);
 
 			// in case of drag of whole selector
-			if (theSelection.bDragAll) {
-				var diffX = Math.min(Math.max(iMouseX - theSelection.get('px'), 0), self.canvasW - theSelection.get('w'));
-				var diffY = Math.min(Math.max(iMouseY - theSelection.get('py'), 0), self.canvasH - theSelection.get('h'));
-				return self.theSelection.move(diffX, diffY);
+			if(self.theSelection.move(iMouseX, iMouseY)){
+				self.fire(ImgCrop.EVENT.DRAG);
 			}
 
 			// hovering over resize cubes
-			self.theSelection._hovering(iMouseX, iMouseY);
+			if(self.theSelection._hovering(iMouseX, iMouseY)){
+				self.fire(ImgCrop.EVENT.HOVER);
+			}
 
 			// in case of dragging of resize cubes
-			self.theSelection.resize(iMouseX, iMouseY);
+			if(self.theSelection.resize(iMouseX, iMouseY)){
+				self.fire(ImgCrop.EVENT.RESIZE);
+			}
+			
+			self._drawScene();
 
 		},
 		_handleMouseDown : function (e) {
@@ -308,9 +297,9 @@ KISSY.add(function (S, Preview, Selection) {
 				theSelection.bDragAll = true;
 			}
 
-			/*for (i = 0; i < 4; i++) {
+			for (i = 0; i < 4; i++) {
 				theSelection.bDrag[i] = theSelection.bHover[i];
-			}*/
+			}
 
 			self.fire(ImgCrop.EVENT.START_DRAG);
 			self.fire(ImgCrop.EVENT.START_RESIZE);
@@ -480,8 +469,8 @@ KISSY.add(function (S, Preview, Selection) {
 				height : this.canvasH
 			};
 		},
-		toString : function () {
-			return S.JSON.stringify(this.getCropCoords());
+		toString : function (space) {
+			return S.JSON.stringify(this.getCropCoords(), null, space || 0);
 		}
 	});
 	return ImgCrop;

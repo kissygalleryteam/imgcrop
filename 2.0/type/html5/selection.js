@@ -57,7 +57,7 @@ KISSY.add(function (S) {
 	};
 	S.extend(Selection, S.Base, {
 		_init : function(){
-			this._bind();
+			//this._bind();
 		},
 		_bind : function(){
 			var self = this;
@@ -154,19 +154,18 @@ KISSY.add(function (S) {
 				mouseenter = true;
 
 			}
-			
-			for (i = 0; i < 4; i++) {
-				self.bDrag[i] = self.bHover[i];
-			}
 
 			if (mouseenter) {
 				self.fire(Selection.EVENT.HOVER);
 			}
+			
+			return mouseenter;
 
 		},
 
 		resize : function (iMouseX, iMouseY) {
 			var self = this;
+			var resizing = false;
 
 			var iFW, iFH, iFX, iFY;
 			if (self.bDrag[0]) {
@@ -190,25 +189,31 @@ KISSY.add(function (S) {
 				iFW = self.get('w') + self.get('x') - iFX;
 				iFH = iMouseY - self.get('py') - iFY;
 			}
+			
+			resizing = S.inArray(true, self.bDrag);
 
-			if (S.inArray(true, self.bDrag)) {
+			if (resizing) {
 				self.set({
 					w : iFW,
 					x : iFX,
 					h : iFH,
 					y : iFY
 				});
-				self.fire(Selection.EVENT.RESIZE);
 			}
+			
+			return resizing;
 
 		},
-		move : function (diffX, diffY) {
+		move : function (iMouseX, iMouseY) {
 			var self = this;
-			self.set({
-				x : diffX,
-				y : diffY
-			});
-			self.fire(Selection.EVENT.DRAG);
+			var moving = self.bDragAll;
+			if (moving) {
+				self.set({
+					x : Math.min(Math.max(iMouseX - self.get('px'), 0), self.get('constraint')[0] - self.get('w')),
+					y : Math.min(Math.max(iMouseY - self.get('py'), 0), self.get('constraint')[1] - self.get('h'))
+				});
+			}
+			return moving;
 		}
 	});
 
