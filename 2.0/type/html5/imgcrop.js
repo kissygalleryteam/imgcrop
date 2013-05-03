@@ -21,8 +21,7 @@ KISSY.add(function (S, Preview, Selection) {
 		RESIZE : "resize",
 		START_RESIZE : "startresize",
 		END_RESIZE : "endresize",
-		IMGLOAD : "imgload",
-		HOVER : "hover"
+		IMGLOAD : "imgload"
 	};
 	ImgCrop.ATTRS = {
 		areaEl : {
@@ -178,11 +177,27 @@ KISSY.add(function (S, Preview, Selection) {
 					constraint : [self.canvasW, self.canvasH]
 				});
 
-			self.theSelection.detach("*Change", _doChange).on("*Change", _doChange);
-
-			function _doChange(e) {
+			self.theSelection.on("*Change", function(){
 				self._drawScene();
-			}
+			});
+			self.theSelection.on("resize", function(){
+				self.fire(ImgCrop.EVENT.RESIZE);
+			});
+			self.theSelection.on("startresize", function(){
+				self.fire(ImgCrop.EVENT.START_RESIZE);
+			});
+			self.theSelection.on("endresize", function(){
+				self.fire(ImgCrop.EVENT.END_RESIZE);
+			});
+			self.theSelection.on("drag", function(){
+				self.fire(ImgCrop.EVENT.DRAG);
+			});
+			self.theSelection.on("startdrag", function(){
+				self.fire(ImgCrop.EVENT.START_DRAG);
+			});
+			self.theSelection.on("enddrag", function(){
+				self.fire(ImgCrop.EVENT.END_DRAG);
+			});
 		},
 		_build : function () {
 			var self = this;
@@ -236,25 +251,22 @@ KISSY.add(function (S, Preview, Selection) {
 			//清除选择
 			window.getSelection ? window.getSelection().removeAllRanges() : document.selection.empty();
 
-			var theSelection = self.theSelection;
 			var canvasOffset = self.canvas.offset();
-			var iMouseX = self.iMouseX = Math.min(Math.max(e.pageX - canvasOffset.left, 0), self.canvasW);
-			var iMouseY = self.iMouseY = Math.min(Math.max(e.pageY - canvasOffset.top, 0), self.canvasH);
+			var iMouseX = Math.min(Math.max(e.pageX - canvasOffset.left, 0), self.canvasW);
+			var iMouseY = Math.min(Math.max(e.pageY - canvasOffset.top, 0), self.canvasH);
 
 			// in case of drag of whole selector
-			if(self.theSelection.move(iMouseX, iMouseY)){
-				self.fire(ImgCrop.EVENT.DRAG);
-			}
-
-			// hovering over resize cubes
-			if(self.theSelection._hovering(iMouseX, iMouseY)){
-				self.fire(ImgCrop.EVENT.HOVER);
+			if(self.theSelection.canMove()){
+				self.theSelection.move(iMouseX - self.iMouseX, iMouseY - self.iMouseY);
 			}
 
 			// in case of dragging of resize cubes
-			if(self.theSelection.resize(iMouseX, iMouseY)){
-				self.fire(ImgCrop.EVENT.RESIZE);
+			if(self.theSelection.canResize()){
+				self.theSelection.resize(iMouseX, iMouseY);
 			}
+			
+			var code = self.theSelection.registerPointPos(iMouseX, iMouseY);
+			self.theSelection.hoverByCode(code);
 			
 			self._drawScene();
 
@@ -263,59 +275,21 @@ KISSY.add(function (S, Preview, Selection) {
 			var self = this;
 			var theSelection = self.theSelection;
 			var canvasOffset = self.canvas.offset();
-			var iMouseX = self.iMouseX = Math.floor(e.pageX - canvasOffset.left);
-			var iMouseY = self.iMouseY = Math.floor(e.pageY - canvasOffset.top);
+			var iMouseX = self.iMouseX = e.pageX - canvasOffset.left;
+			var iMouseY = self.iMouseY = e.pageY - canvasOffset.top;
 
-			var px, py;
-			if (theSelection.bHover[0]) {
-				px = iMouseX - theSelection.get('x');
-				py = iMouseY - theSelection.get('y');
-			} else if (theSelection.bHover[1]) {
-				px = iMouseX - theSelection.get('x') - theSelection.get('w');
-				py = iMouseY - theSelection.get('y');
-			} else if (theSelection.bHover[2]) {
-				px = iMouseX - theSelection.get('x') - theSelection.get('w');
-				py = iMouseY - theSelection.get('y') - theSelection.get('h');
-			} else if (theSelection.bHover[3]) {
-				px = iMouseX - theSelection.get('x');
-				py = iMouseY - theSelection.get('y') - theSelection.get('h');
-			} else {
-				px = iMouseX - theSelection.get('x');
-				py = iMouseY - theSelection.get('y');
-			}
-
+			//缓存坐标，move时需要
 			theSelection.set({
-				px : px,
-				py : py
-			});
+				px : theSelection.get('x'),
+				py : theSelection.get('y')
+			},{silent:true});
 
-			if (iMouseX > theSelection.get('x') + theSelection.csizeh &&
-				iMouseX < theSelection.get('x') + theSelection.get('w') - theSelection.csizeh &&
-				iMouseY > theSelection.get('y') + theSelection.csizeh &&
-				iMouseY < theSelection.get('y') + theSelection.get('h') - theSelection.csizeh) {
-
-				theSelection.bDragAll = true;
-			}
-
-			for (i = 0; i < 4; i++) {
-				theSelection.bDrag[i] = theSelection.bHover[i];
-			}
-
-			self.fire(ImgCrop.EVENT.START_DRAG);
-			self.fire(ImgCrop.EVENT.START_RESIZE);
+			var code = theSelection.registerPointPos(iMouseX, iMouseY);
+			theSelection.markByCode(code);
 		},
 		_handleMouseUp : function (e) {
 			var self = this;
-			var theSelection = self.theSelection;
-			theSelection.bDragAll = false;
-			for (i = 0; i < theSelection.bDrag.length; i++) {
-				theSelection.bDrag[i] = false;
-			}
-			theSelection.set({
-				px : 0,
-				py : 0
-			});
-			theSelection.resetCubes();
+			self.theSelection.reset();
 			self.fire(ImgCrop.EVENT.END_DRAG);
 			self.fire(ImgCrop.EVENT.END_RESIZE);
 		},
@@ -355,10 +329,10 @@ KISSY.add(function (S, Preview, Selection) {
 				py : py
 			});
 
-			if (iMouseX > theSelection.get('x') + theSelection.csizeh &&
-				iMouseX < theSelection.get('x') + theSelection.get('w') - theSelection.csizeh &&
-				iMouseY > theSelection.get('y') + theSelection.csizeh &&
-				iMouseY < theSelection.get('y') + theSelection.get('h') - theSelection.csizeh) {
+			if (iMouseX > theSelection.get('x') + theSelection.csize &&
+				iMouseX < theSelection.get('x') + theSelection.get('w') - theSelection.csize &&
+				iMouseY > theSelection.get('y') + theSelection.csize &&
+				iMouseY < theSelection.get('y') + theSelection.get('h') - theSelection.csize) {
 
 				theSelection.bDragAll = true;
 			}
