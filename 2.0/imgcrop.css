@@ -1,0 +1,76 @@
+.crop-point {
+    position: absolute;
+    background: #FFF;
+    border: 1px solid #666;
+    width: 6px;
+    height: 6px;
+    z-index: 5000;
+    opacity:0.8;
+    filter:alpha(opacity=80);
+}
+
+.point-lb, .point-rt {
+    cursor: ne-resize;
+}
+
+.point-rb, .point-lt {
+    cursor: nw-resize;
+}
+
+.point-l, .point-r {
+    cursor: e-resize;
+}
+
+.point-t, .point-b {
+    cursor: n-resize;
+}
+
+.point-lb {
+    left: -4px;
+    bottom: -4px;
+}
+
+.point-rt {
+    right: -4px;
+    top: -4px;
+}
+
+.point-rb {
+    right: -4px;
+    bottom: -4px;
+}
+
+.point-lt {
+    left: -4px;
+    top: -4px;
+}
+
+.point-r {
+    right: -4px;
+    top: 50%;
+    margin-top: -4px;
+}
+
+.point-l {
+    left: -4px;
+    top: 50%;
+    margin-top: -4px;
+}
+
+.point-t {
+    top: -4px;
+    left: 50%;
+    margin-left: -4px;
+}
+
+.point-b {
+    bottom: -4px;
+    left: 50%;
+    margin-left: -4px;
+}
+
+.crop {
+    border: 1px solid #fff;
+    cursor: move;
+    background: url('blank');
+}
