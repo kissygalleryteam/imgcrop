@@ -1805,7 +1805,8 @@ KISSY.add('gallery/imgcrop/2.0/type/normal/imgcrop',function (S, Resize, Drag) {
     attach:false,
     requires:[
         './resizable',
-        './dragable'
+        './dragable',
+        'gallery/gallery/imgcrop/2.0/imgcrop.css'
     ]
 });
 
@@ -1823,7 +1824,7 @@ KISSY.add('gallery/imgcrop/2.0/index',function (S, ImgCrop) {
     return Index;
 }, {
     requires:[
-		'getContext' in document.createElement('canvas') ? './type/html5/imgcrop' : './type/normal/imgcrop', './index.css'
+		'getContext' in document.createElement('canvas') ? './type/html5/imgcrop' : './type/normal/imgcrop'
 	]
 });
 
