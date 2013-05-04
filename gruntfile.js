@@ -33,10 +33,25 @@ module.exports = function (grunt) {
                 }
             }
         },
+        copy:{
+            options:{
+                banner:'<%= banner %>'
+            },
+            main:{
+                files:[
+                    {
+                        expand:true,
+                        cwd:'<%= pkg.version %>/',
+                        src:['*.css'],
+                        dest:'<%= pkg.version %>/build/'
+                    }
+                ]
+            }
+        },
         cssmin:{
             minify:{
                 expand:true,
-                cwd:'<%= pkg.version %>/',
+                cwd:'<%= pkg.version %>/build/',
                 src:['*.css', '!*.min.css'],
                 dest:'<%= pkg.version %>/build/',
                 ext:'.min.css'
@@ -48,5 +63,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-kmc');
-    return grunt.registerTask('default', ['kmc', 'uglify', 'cssmin']);
+    return grunt.registerTask('default', ['kmc', 'uglify', 'copy', 'cssmin']);
 };
