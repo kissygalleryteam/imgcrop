@@ -4,18 +4,18 @@ KISSY.add(function (S) {
 		Selection.superclass.constructor.apply(this, arguments);
 
 		this.csize = 4; // resize cubes size
-		this.csizeh = 6; // resize cubes size (on hover)
-
-		this.bHover = [false, false, false, false]; // hover statuses
-		this.iCSize = [this.csize, this.csize, this.csize, this.csize]; // resize cubes sizes
+		
 		this.bDrag = [false, false, false, false]; // drag statuses
 		this.bDragAll = false; // drag whole selection
 		this._init();
 	}
 	Selection.EVENT = {
 		DRAG : "drag",
+		START_DRAG : "startdrag",
+		END_DRAG : "enddrag",
 		RESIZE : "resize",
-		HOVER : "hover"
+		START_RESIZE : "startresize",
+		END_RESIZE : "endresize",
 	};
 	Selection.ATTRS = {
 		x : {
@@ -29,12 +29,6 @@ KISSY.add(function (S) {
 		},
 		h : {
 			value : 50
-		},
-		px : {
-			value : 0
-		},
-		py : {
-			value : 0
 		},
 		minWidth : {
 			value : 50
@@ -87,15 +81,15 @@ KISSY.add(function (S) {
 			};
 			this.set(rect);
 			ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
-
+			
+			ctx.canvas.style.cursor = this.cursor;
 			if (this.get('resizable')) {
 				// draw resize cubes
 				ctx.fillStyle = this.get('cubesColor');
-				//ctx.canvas.style.cursor = this.cursor;
-				ctx.fillRect(this.get('x') - this.iCSize[0], this.get('y') - this.iCSize[0], this.iCSize[0] * 2, this.iCSize[0] * 2);
-				ctx.fillRect(this.get('x') + this.get('w') - this.iCSize[1], this.get('y') - this.iCSize[1], this.iCSize[1] * 2, this.iCSize[1] * 2);
-				ctx.fillRect(this.get('x') + this.get('w') - this.iCSize[2], this.get('y') + this.get('h') - this.iCSize[2], this.iCSize[2] * 2, this.iCSize[2] * 2);
-				ctx.fillRect(this.get('x') - this.iCSize[3], this.get('y') + this.get('h') - this.iCSize[3], this.iCSize[3] * 2, this.iCSize[3] * 2);
+				ctx.fillRect(this.get('x') - this.csize, this.get('y') - this.csize, this.csize * 2, this.csize * 2);
+				ctx.fillRect(this.get('x') + this.get('w') - this.csize, this.get('y') - this.csize, this.csize * 2, this.csize * 2);
+				ctx.fillRect(this.get('x') + this.get('w') - this.csize, this.get('y') + this.get('h') - this.csize, this.csize * 2, this.csize * 2);
+				ctx.fillRect(this.get('x') - this.csize, this.get('y') + this.get('h') - this.csize, this.csize * 2, this.csize * 2);
 			}
 		},
 		getInfo : function () {
@@ -106,114 +100,125 @@ KISSY.add(function (S) {
 				h : this.get('h')
 			}
 		},
-		resetCubes : function () {
-			var self = this;
-			for (i = 0; i < self.bHover.length; i++) {
-				self.bHover[i] = false;
-				self.iCSize[i] = self.csize;
-			}
-		},
-		_hovering : function (iMouseX, iMouseY) {
-			var self = this;
-
-			//reset cubes
-			self.resetCubes();
-
-			self.cursor = 'default';
-
-			var mouseenter = false;
-
-			if (iMouseX > self.get('x') - self.csizeh && iMouseX < self.get('x') + self.csizeh &&
-				iMouseY > self.get('y') - self.csizeh && iMouseY < self.get('y') + self.csizeh) {
-
-				mouseenter = self.bHover[0] = true;
-				self.iCSize[0] = self.csizeh;
-
-			} else if (iMouseX > self.get('x') + self.get('w') - self.csizeh && iMouseX < self.get('x') + self.get('w') + self.csizeh &&
-				iMouseY > self.get('y') - self.csizeh && iMouseY < self.get('y') + self.csizeh) {
-
-				mouseenter = self.bHover[1] = true;
-				self.iCSize[1] = self.csizeh;
-
-			} else if (iMouseX > self.get('x') + self.get('w') - self.csizeh && iMouseX < self.get('x') + self.get('w') + self.csizeh &&
-				iMouseY > self.get('y') + self.get('h') - self.csizeh && iMouseY < self.get('y') + self.get('h') + self.csizeh) {
-
-				mouseenter = self.bHover[2] = true;
-				self.iCSize[2] = self.csizeh;
-
-			} else if (iMouseX > self.get('x') - self.csizeh && iMouseX < self.get('x') + self.csizeh &&
-				iMouseY > self.get('y') + self.get('h') - self.csizeh && iMouseY < self.get('y') + self.get('h') + self.csizeh) {
-
-				mouseenter = self.bHover[3] = true;
-				self.iCSize[3] = self.csizeh;
-
-			} else if (iMouseX > self.get('x') + self.csizeh && iMouseX < self.get('x') + self.get('w') - self.csizeh &&
-				iMouseY > self.get('y') + self.csizeh && iMouseY < self.get('y') + self.get('h') - self.csizeh) {
-
-				self.cursor = 'move';
-				mouseenter = true;
-
-			}
-
-			if (mouseenter) {
-				self.fire(Selection.EVENT.HOVER);
-			}
-			
-			return mouseenter;
-
-		},
 
 		resize : function (iMouseX, iMouseY) {
 			var self = this;
-			var resizing = false;
 
 			var iFW, iFH, iFX, iFY;
 			if (self.bDrag[0]) {
-				iFX = iMouseX - self.get('px');
-				iFY = iMouseY - self.get('py');
-				iFW = self.get('w') + self.get('x') - iFX;
-				iFH = self.get('h') + self.get('y') - iFY;
+				iFX = iMouseX;
+				iFY = iMouseY;
+				iFW = self.get('w') + self.get('x') - iMouseX;
+				iFH = self.get('h') + self.get('y') - iMouseY;
 			} else if (self.bDrag[1]) {
 				iFX = self.get('x');
-				iFY = iMouseY - self.get('py');
-				iFW = iMouseX - self.get('px') - iFX;
-				iFH = self.get('h') + self.get('y') - iFY;
+				iFY = iMouseY;
+				iFW = iMouseX - self.get('x');
+				iFH = self.get('h') + self.get('y') - iMouseY;
 			} else if (self.bDrag[2]) {
 				iFX = self.get('x');
 				iFY = self.get('y');
-				iFW = iMouseX - self.get('px') - iFX;
-				iFH = iMouseY - self.get('py') - iFY;
+				iFW = iMouseX - self.get('x');
+				iFH = iMouseY - self.get('y');
 			} else if (self.bDrag[3]) {
-				iFX = iMouseX - self.get('px');
+				iFX = iMouseX;
 				iFY = self.get('y');
-				iFW = self.get('w') + self.get('x') - iFX;
-				iFH = iMouseY - self.get('py') - iFY;
+				iFW = self.get('w') + self.get('x') - iMouseX;
+				iFH = iMouseY - self.get('y');
 			}
 			
-			resizing = S.inArray(true, self.bDrag);
-
-			if (resizing) {
-				self.set({
-					w : iFW,
-					x : iFX,
-					h : iFH,
-					y : iFY
-				});
-			}
-			
-			return resizing;
+			self.set({
+				w : iFW,
+				x : iFX,
+				h : iFH,
+				y : iFY
+			});
+			self.fire(Selection.EVENT.RESIZE);
 
 		},
-		move : function (iMouseX, iMouseY) {
+		move : function (diffX, diffY) {
 			var self = this;
-			var moving = self.bDragAll;
-			if (moving) {
-				self.set({
-					x : Math.min(Math.max(iMouseX - self.get('px'), 0), self.get('constraint')[0] - self.get('w')),
-					y : Math.min(Math.max(iMouseY - self.get('py'), 0), self.get('constraint')[1] - self.get('h'))
-				});
+			self.set({
+				x : Math.min(Math.max(self.get('px')+diffX, 0), self.get('constraint')[0] - self.get('w')),
+				y : Math.min(Math.max(self.get('py')+diffY, 0), self.get('constraint')[1] - self.get('h'))
+			});
+			self.fire(Selection.EVENT.DRAG);
+		},
+		registerPointPos : function(iMouseX, iMouseY){
+			var self = this;
+			var code = -1;
+			if (iMouseX > self.get('x') + self.csize &&
+				iMouseX < self.get('x') + self.get('w') - self.csize &&
+				iMouseY > self.get('y') + self.csize &&
+				iMouseY < self.get('y') + self.get('h') - self.csize) {
+				
+				code = 0;
 			}
-			return moving;
+			
+			if (iMouseX > self.get('x') - self.csize && iMouseX < self.get('x') + self.csize &&
+				iMouseY > self.get('y') - self.csize && iMouseY < self.get('y') + self.csize) {
+
+				code = 1;
+
+			} else if (iMouseX > self.get('x') + self.get('w') - self.csize && iMouseX < self.get('x') + self.get('w') + self.csize &&
+				iMouseY > self.get('y') - self.csize && iMouseY < self.get('y') + self.csize) {
+
+				code = 2;
+
+			} else if (iMouseX > self.get('x') + self.get('w') - self.csize && iMouseX < self.get('x') + self.get('w') + self.csize &&
+				iMouseY > self.get('y') + self.get('h') - self.csize && iMouseY < self.get('y') + self.get('h') + self.csize) {
+
+				code = 3;
+
+			} else if (iMouseX > self.get('x') - self.csize && iMouseX < self.get('x') + self.csize &&
+				iMouseY > self.get('y') + self.get('h') - self.csize && iMouseY < self.get('y') + self.get('h') + self.csize) {
+
+				code = 4;
+
+			}
+			return code;
+		},
+		markByCode : function(code){
+			var self = this;
+			if(code === -1) return;
+			
+			if(code === 0){
+				self.bDragAll = true;
+				self.fire(Selection.EVENT.START_DRAG);
+			}else{
+				self.bDrag[code-1] = true;
+				self.fire(Selection.EVENT.START_RESIZE);
+			}
+		},
+		hoverByCode : function(code){
+			var self = this;
+			switch(code){
+				case 0:
+					self.cursor = 'move';
+					break;
+				case 1:
+				case 3:
+					self.cursor = 'nw-resize';
+					break;
+				case 2:
+				case 4:
+					self.cursor = 'ne-resize';
+					break;
+				default:
+					self.cursor = 'default';
+			}
+		},
+		canMove : function(){
+			return this.bDragAll;
+		},
+		canResize : function(){
+			return S.inArray(true, this.bDrag);
+		},
+		reset : function(){
+			this.bDragAll = false;
+			for (i = 0; i < this.bDrag.length; i++) {
+				this.bDrag[i] = false;
+			}
 		}
 	});
 
