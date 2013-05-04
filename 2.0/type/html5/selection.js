@@ -152,28 +152,28 @@ KISSY.add(function (S) {
 				iMouseY > self.get('y') + self.csize &&
 				iMouseY < self.get('y') + self.get('h') - self.csize) {
 				
-				code = 100;
+				code = 0;
 			}
 			
 			if (iMouseX > self.get('x') - self.csize && iMouseX < self.get('x') + self.csize &&
 				iMouseY > self.get('y') - self.csize && iMouseY < self.get('y') + self.csize) {
 
-				code = 0;
+				code = 1;
 
 			} else if (iMouseX > self.get('x') + self.get('w') - self.csize && iMouseX < self.get('x') + self.get('w') + self.csize &&
 				iMouseY > self.get('y') - self.csize && iMouseY < self.get('y') + self.csize) {
 
-				code = 1;
+				code = 2;
 
 			} else if (iMouseX > self.get('x') + self.get('w') - self.csize && iMouseX < self.get('x') + self.get('w') + self.csize &&
 				iMouseY > self.get('y') + self.get('h') - self.csize && iMouseY < self.get('y') + self.get('h') + self.csize) {
 
-				code = 2;
+				code = 3;
 
 			} else if (iMouseX > self.get('x') - self.csize && iMouseX < self.get('x') + self.csize &&
 				iMouseY > self.get('y') + self.get('h') - self.csize && iMouseY < self.get('y') + self.get('h') + self.csize) {
 
-				code = 3;
+				code = 4;
 
 			}
 			return code;
@@ -182,26 +182,26 @@ KISSY.add(function (S) {
 			var self = this;
 			if(code === -1) return;
 			
-			if(code === 100){
+			if(code === 0){
 				self.bDragAll = true;
 				self.fire(Selection.EVENT.START_DRAG);
 			}else{
-				self.bDrag[code] = true;
+				self.bDrag[code-1] = true;
 				self.fire(Selection.EVENT.START_RESIZE);
 			}
 		},
 		hoverByCode : function(code){
 			var self = this;
 			switch(code){
-				case 100:
-					self.cursor = 'move';
-					break;
 				case 0:
-				case 2:
-					self.cursor = 'nw-resize';
+					self.cursor = 'move';
 					break;
 				case 1:
 				case 3:
+					self.cursor = 'nw-resize';
+					break;
+				case 2:
+				case 4:
 					self.cursor = 'ne-resize';
 					break;
 				default:

@@ -97,7 +97,7 @@ KISSY.add(function (S, Preview, Selection) {
 		},
 		_bind : function () {
 			var self = this;
-			$(document).on('mousemove', self._handleMouseMove, self);
+			self.canvas.on('mousemove', self._handleHover, self);
 			self.canvas.on('mousedown', self._handleMouseDown, self);
 			$(document).on('mouseup', self._handleMouseUp, self);
 			self.on("*Change", self._doAttrChange, self);
@@ -246,6 +246,17 @@ KISSY.add(function (S, Preview, Selection) {
 			self.theSelection.draw(ctx);
 		},
 
+		_handleHover : function(e){
+			var self = this;
+			var canvasOffset = self.canvas.offset();
+			var iMouseX = e.pageX - canvasOffset.left;
+			var iMouseY = e.pageY - canvasOffset.top;
+			var code = self.theSelection.registerPointPos(iMouseX, iMouseY);
+			self.theSelection.hoverByCode(code);
+			
+			self._drawScene();
+		},
+
 		_handleMouseMove : function (e) {
 			var self = this;
 			//清除选择
@@ -265,9 +276,6 @@ KISSY.add(function (S, Preview, Selection) {
 				self.theSelection.resize(iMouseX, iMouseY);
 			}
 			
-			var code = self.theSelection.registerPointPos(iMouseX, iMouseY);
-			self.theSelection.hoverByCode(code);
-			
 			self._drawScene();
 
 		},
@@ -286,10 +294,13 @@ KISSY.add(function (S, Preview, Selection) {
 
 			var code = theSelection.registerPointPos(iMouseX, iMouseY);
 			theSelection.markByCode(code);
+			
+			$(document).on('mousemove', self._handleMouseMove, self);
 		},
 		_handleMouseUp : function (e) {
 			var self = this;
 			self.theSelection.reset();
+			$(document).detach('mousemove', self._handleMouseMove, self);
 			self.fire(ImgCrop.EVENT.END_DRAG);
 			self.fire(ImgCrop.EVENT.END_RESIZE);
 		},
