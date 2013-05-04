@@ -76,13 +76,13 @@ KISSY.add(function (S, Preview, Selection) {
          * 视窗的最小高度
          */
         minHeight:{
-            value:100
+            value:10
         },
         /**
          * 视窗的最小宽度
          */
         minWidth:{
-            value:100
+            value:10
         },
         /**
          * 初始坐标
@@ -112,13 +112,13 @@ KISSY.add(function (S, Preview, Selection) {
          * 预览窗口高度
          */
         viewHeight:{
-            value:300
+            value:100
         },
         /**
          * 预览窗口宽度
          */
         viewWidth:{
-            value:300
+            value:100
         },
         /**
          * 是否支持touch、pinch
