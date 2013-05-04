@@ -30,11 +30,22 @@ module.exports = function(grunt) {
           '<%= pkg.version %>/build/index-min.js': ['<%= pkg.version %>/build/index.js']
         }
       }
-    }
+    },
+	cssmin: {
+	  minify: {
+		expand: true,
+		cwd: '<%= pkg.version %>/',
+		src: ['*.css', '!*.min.css'],
+		dest: '<%= pkg.version %>/build/',
+		ext: '.min.css'
+	  }
+	}
   });
+  
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-kmc');
-  return grunt.registerTask('default', ['kmc', 'uglify']);
+  return grunt.registerTask('default', ['kmc', 'uglify', 'cssmin']);
 };
