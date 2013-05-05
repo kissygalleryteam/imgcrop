@@ -12,6 +12,6 @@ KISSY.add(function (S, ImgCrop) {
     return Index;
 }, {
     requires:[
-		'getContext' in document.createElement('canvas') ? './type/html5/imgcrop' : './type/normal/imgcrop'
+		'getContext' in document.createElement('canvas') ? './type/html5/imgcrop' : './type/normal/imgcrop', './index.css'
 	]
 });
