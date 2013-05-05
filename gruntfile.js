@@ -52,9 +52,9 @@ module.exports = function (grunt) {
             minify:{
                 expand:true,
                 cwd:'<%= pkg.version %>/build/',
-                src:['*.css', '!*.min.css'],
+                src:['*.css', '!*-min.css'],
                 dest:'<%= pkg.version %>/build/',
-                ext:'.min.css'
+                ext:'-min.css'
             }
         }
     });

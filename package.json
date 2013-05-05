@@ -1,7 +1,12 @@
 {
-    "name": "imgcrop",
-    "version":"2.0",
-    "author":"元泉",
-    "cover":"http://img02.taobaocdn.com/tps/i2/T1ZC5xXyXbXXc6VVHG-503-566.jpg",
-    "desc":"图像剪裁组件"
+  "name": "imgcrop",
+  "version": "0.2.0",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-cssmin": "~0.1.1",
+    "grunt-contrib-clean": "~0.1.2",
+    "grunt-contrib-copy": "~0.1.2",
+    "grunt-contrib-uglify": "~0.1.2",
+    "grunt-kmc": "~0.1.2"
+  }
 }
