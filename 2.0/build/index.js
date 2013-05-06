@@ -30,10 +30,10 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/preview',function (S) {
             value:''
         },
         viewHeight:{
-            value:300
+            value:100
         },
         viewWidth:{
-            value:300
+            value:100
         },
         image:{
             value:null
@@ -55,39 +55,32 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/preview',function (S) {
             self.container.html('').append(self.canvas.css({
                 position:'absolute'
             }));
-            self._rejustSize();
+
+            self.canvas[0].width = self.canvasW = viewWidth;
+            self.canvas[0].height = self.canvasH = viewHeight;
         },
-        _rejustSize:function () {
-            var self = this;
-            var image = self.get('image'),
-                viewWidth = self.get('viewWidth'),
-                viewHeight = self.get('viewHeight'),
-                imgW = image.width,
-                imgH = image.height,
-                new_width,
-                new_height;
-            if ((imgW / viewWidth) > (imgH / viewHeight)) {
-                new_width = Math.min(viewWidth, imgW);
+        _rejustSize:function (imgW, imgH, conW, conH) {
+            var new_width, new_height;
+            if ((imgW / conW) > (imgH / conH)) {
+                new_width = Math.min(conW, imgW);
                 new_height = new_width * imgH / imgW;
             } else {
-                new_height = Math.min(viewHeight, imgH);
+                new_height = Math.min(conH, imgH);
                 new_width = new_height * imgW / imgH;
             }
-            self.canvas[0].width = self.canvasW = Math.floor(new_width);
-            self.canvas[0].height = self.canvasH = Math.floor(new_height);
-            self.canvas.css({
-                top:(self.container.height() - self.canvasH) / 2,
-                left:(self.container.width() - self.canvasW) / 2
-            });
+            return {
+                w : new_width,
+                h : new_height,
+                x : (conW - new_width)/2,
+                y : (conH - new_height)/2
+            };
         },
         draw:function (x, y, w, h, r) {
             var self = this;
             // clear canvas
             self.ctx.clearRect(0, 0, self.canvasW, self.canvasH);
-            var image = self.get('image');
-            var preW = Math.floor(w * r * self.canvasW / image.width);
-            var preH = Math.floor(h * r * self.canvasH / image.height);
-            self.ctx.drawImage(image, Math.floor(x * r), Math.floor(y * r), Math.floor(w * r), Math.floor(h * r), 0, 0, preW, preH);
+            var newCoords = self._rejustSize(w * r, h * r, self.canvasW, self.canvasH);
+            self.ctx.drawImage(self.get('image'), x * r, y * r, w * r, h * r, newCoords.x, newCoords.y, newCoords.w, newCoords.h);
         },
         destroy:function () {
             this.canvas.remove();
@@ -173,10 +166,10 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/selection',function (S) {
             ctx.strokeStyle = self.get('borderColor');
             ctx.lineWidth = 1;
             var rect = {
-                x:Math.max(self.get('x'), 0),
-                y:Math.max(self.get('y'), 0),
                 w:Math.min(Math.max(self.get('w'), self.get('minWidth')), canvasW),
-                h:Math.min(Math.max(self.get('h'), self.get('minHeight')), canvasH)
+                h:Math.min(Math.max(self.get('h'), self.get('minHeight')), canvasH),
+                x:Math.min(Math.max(self.get('x'), 0), canvasW-self.get('w')),
+                y:Math.min(Math.max(self.get('y'), 0), canvasH-self.get('h'))
             };
             self.set(rect);
             ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
@@ -187,22 +180,6 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/selection',function (S) {
             ctx.fillRect(0, self.get('y'), self.get('x'), self.get('h'));
             ctx.fillRect(self.get('x') + self.get('w'), self.get('y'), canvasW - self.get('x') - self.get('w'), self.get('h'));
             ctx.fillRect(0, self.get('y') + self.get('h'), canvasW, canvasH - self.get('y') - self.get('h'));
-
-            //这种形式图像会动
-            /*
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-            ctx.fillRect(0, 0, canvasW, canvasH);
-            var r = image.width / canvasW;
-            ctx.drawImage(image,
-                self.get('x') * r,
-                self.get('y') * r,
-                self.get('w') * r,
-                self.get('h') * r,
-                self.get('x'),
-                self.get('y'),
-                self.get('w'),
-                self.get('h')
-            );*/
 
             /**
              * 鼠标形状
@@ -232,30 +209,35 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/selection',function (S) {
         resize:function (iMouseX, iMouseY) {
             var self = this;
             var iFW, iFH, iFX, iFY;
+
             if (self.bDrag[0]) {
-                iFX = iMouseX;
-                iFY = iMouseY;
-                iFW = self.get('w') + self.get('x') - iMouseX;
-                iFH = self.get('h') + self.get('y') - iMouseY;
+                iFX = Math.min(iMouseX, self.get('w') + self.get('x') - self.get('minWidth'));
+                iFY = Math.min(iMouseY, self.get('h') + self.get('y') - self.get('minHeight'));
+                iFW = self.get('w') + self.get('x') - iFX;
+                iFH = self.get('h') + self.get('y') - iFY;
             } else if (self.bDrag[1]) {
                 iFX = self.get('x');
-                iFY = iMouseY;
-                iFW = iMouseX - self.get('x');
-                iFH = self.get('h') + self.get('y') - iMouseY;
+                iFY = Math.min(iMouseY, self.get('h') + self.get('y') - self.get('minHeight'));
+                iFW = iMouseX - iFX;
+                iFH = self.get('h') + self.get('y') - iFY;
             } else if (self.bDrag[2]) {
                 iFX = self.get('x');
                 iFY = self.get('y');
-                iFW = iMouseX - self.get('x');
-                iFH = iMouseY - self.get('y');
+                iFW = iMouseX - iFX;
+                iFH = iMouseY - iFY;
             } else if (self.bDrag[3]) {
-                iFX = iMouseX;
+                iFX = Math.min(iMouseX, self.get('w') + self.get('x') - self.get('minWidth'));
                 iFY = self.get('y');
-                iFW = self.get('w') + self.get('x') - iMouseX;
-                iFH = iMouseY - self.get('y');
+                iFW = self.get('w') + self.get('x') - iFX;
+                iFH = iMouseY - iFY;
             }
             //固定比例
             if (self.get("ratio")) {
-                iFH = iFW * self.get('h') / self.get("w");
+                //水平方向会移动
+                var r = self.get('pw') / self.get("ph");
+                if(iFW / iFH  !== r){
+                    iFW = iFH * r;
+                }
             }
             self.set({
                 w:iFW, x:iFX, h:iFH, y:iFY
@@ -278,8 +260,7 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/selection',function (S) {
                 iMouseY > self.get('y') + self.csize &&
                 iMouseY < self.get('y') + self.get('h') - self.csize) {
                 code = 0;
-            }
-            if (iMouseX > self.get('x') - self.csize && iMouseX < self.get('x') + self.csize &&
+            }else if (iMouseX > self.get('x') - self.csize && iMouseX < self.get('x') + self.csize &&
                 iMouseY > self.get('y') - self.csize && iMouseY < self.get('y') + self.csize) {
                 code = 1;
             } else if (iMouseX > self.get('x') + self.get('w') - self.csize && iMouseX < self.get('x') + self.get('w') + self.csize &&
@@ -313,11 +294,11 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/selection',function (S) {
                     break;
                 case 1:
                 case 3:
-                    self.cursor = 'nw-resize';
+                    self.cursor = self.get('resizable') ? 'nw-resize' : 'default';
                     break;
                 case 2:
                 case 4:
-                    self.cursor = 'ne-resize';
+                    self.cursor = self.get('resizable') ? 'ne-resize' : 'default';
                     break;
                 default:
                     self.cursor = 'default';
@@ -691,7 +672,7 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/imgcrop',function (S, Preview, Selecti
                 self.theSelection.move(iMouseX - self.iMouseX, iMouseY - self.iMouseY);
             }
             // in case of dragging of resize cubes
-            if (self.theSelection.canResize()) {
+            if (self.get('resizable') && self.theSelection.canResize()) {
                 self.theSelection.resize(iMouseX, iMouseY);
             }
             self._drawScene();
@@ -710,8 +691,11 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/imgcrop',function (S, Preview, Selecti
             //缓存坐标，move时需要
             theSelection.set({
                 px:theSelection.get('x'),
-                py:theSelection.get('y')
+                py:theSelection.get('y'),
+                pw:theSelection.get('w'),
+                ph:theSelection.get('h')
             }, {silent:true});
+
             var code = theSelection.registerPointPos(iMouseX, iMouseY);
             theSelection.markByCode(code);
             $(document).on('mousemove', self._handleMouseMove, self);
@@ -773,7 +757,6 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/imgcrop',function (S, Preview, Selecti
             if (e.targetTouches.length == 1) {
                 e.preventDefault(); // 阻止浏览器默认事件，重要
                 var touch = e.targetTouches[0];
-                var theSelection = self.theSelection;
                 var canvasOffset = self.canvas.offset();
                 var iMouseX = Math.min(Math.max(touch.pageX - canvasOffset.left, 0), self.canvasW);
                 var iMouseY = Math.min(Math.max(touch.pageY - canvasOffset.top, 0), self.canvasH);
@@ -782,7 +765,7 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/imgcrop',function (S, Preview, Selecti
                     self.theSelection.move(iMouseX - self.iMouseX, iMouseY - self.iMouseY);
                 }
                 // in case of dragging of resize cubes
-                if (self.theSelection.canResize()) {
+                if (self.get('resizable') && self.theSelection.canResize()) {
                     self.theSelection.resize(iMouseX, iMouseY);
                 }
                 self._drawScene();
