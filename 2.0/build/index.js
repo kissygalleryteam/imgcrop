@@ -1795,8 +1795,9 @@ KISSY.add('gallery/imgcrop/2.0/type/normal/imgcrop',function (S, Resize, Drag) {
 /**
  * 图片剪裁组件
  * author 元泉
- * date 2013-3-31
+ * date 2013-5-4
  */
+var __surportCanvas = 'getContext' in document.createElement('canvas');
 KISSY.add('gallery/imgcrop/2.0/index',function (S, ImgCrop) {
 
     function Index(option) {
@@ -1806,7 +1807,7 @@ KISSY.add('gallery/imgcrop/2.0/index',function (S, ImgCrop) {
     return Index;
 }, {
     requires:[
-		'getContext' in document.createElement('canvas') ? './type/html5/imgcrop' : './type/normal/imgcrop', './index.css'
+		__surportCanvas ? './type/html5/imgcrop' : './type/normal/imgcrop', !__surportCanvas ? './index.css' : ''
 	]
 });
 
