@@ -18,10 +18,10 @@ KISSY.add(function (S) {
             value:''
         },
         viewHeight:{
-            value:300
+            value:100
         },
         viewWidth:{
-            value:300
+            value:100
         },
         image:{
             value:null
@@ -43,39 +43,32 @@ KISSY.add(function (S) {
             self.container.html('').append(self.canvas.css({
                 position:'absolute'
             }));
-            self._rejustSize();
+
+            self.canvas[0].width = self.canvasW = viewWidth;
+            self.canvas[0].height = self.canvasH = viewHeight;
         },
-        _rejustSize:function () {
-            var self = this;
-            var image = self.get('image'),
-                viewWidth = self.get('viewWidth'),
-                viewHeight = self.get('viewHeight'),
-                imgW = image.width,
-                imgH = image.height,
-                new_width,
-                new_height;
-            if ((imgW / viewWidth) > (imgH / viewHeight)) {
-                new_width = Math.min(viewWidth, imgW);
+        _rejustSize:function (imgW, imgH, conW, conH) {
+            var new_width, new_height;
+            if ((imgW / conW) > (imgH / conH)) {
+                new_width = Math.min(conW, imgW);
                 new_height = new_width * imgH / imgW;
             } else {
-                new_height = Math.min(viewHeight, imgH);
+                new_height = Math.min(conH, imgH);
                 new_width = new_height * imgW / imgH;
             }
-            self.canvas[0].width = self.canvasW = Math.floor(new_width);
-            self.canvas[0].height = self.canvasH = Math.floor(new_height);
-            self.canvas.css({
-                top:(self.container.height() - self.canvasH) / 2,
-                left:(self.container.width() - self.canvasW) / 2
-            });
+            return {
+                w : new_width,
+                h : new_height,
+                x : (conW - new_width)/2,
+                y : (conH - new_height)/2
+            };
         },
         draw:function (x, y, w, h, r) {
             var self = this;
             // clear canvas
             self.ctx.clearRect(0, 0, self.canvasW, self.canvasH);
-            var image = self.get('image');
-            var preW = Math.floor(w * r * self.canvasW / image.width);
-            var preH = Math.floor(h * r * self.canvasH / image.height);
-            self.ctx.drawImage(image, Math.floor(x * r), Math.floor(y * r), Math.floor(w * r), Math.floor(h * r), 0, 0, preW, preH);
+            var newCoords = self._rejustSize(w * r, h * r, self.canvasW, self.canvasH);
+            self.ctx.drawImage(self.get('image'), x * r, y * r, w * r, h * r, newCoords.x, newCoords.y, newCoords.w, newCoords.h);
         },
         destroy:function () {
             this.canvas.remove();

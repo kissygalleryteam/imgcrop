@@ -73,10 +73,10 @@ KISSY.add(function (S) {
             ctx.strokeStyle = self.get('borderColor');
             ctx.lineWidth = 1;
             var rect = {
-                x:Math.max(self.get('x'), 0),
-                y:Math.max(self.get('y'), 0),
                 w:Math.min(Math.max(self.get('w'), self.get('minWidth')), canvasW),
-                h:Math.min(Math.max(self.get('h'), self.get('minHeight')), canvasH)
+                h:Math.min(Math.max(self.get('h'), self.get('minHeight')), canvasH),
+                x:Math.min(Math.max(self.get('x'), 0), canvasW-self.get('w')),
+                y:Math.min(Math.max(self.get('y'), 0), canvasH-self.get('h'))
             };
             self.set(rect);
             ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
@@ -87,22 +87,6 @@ KISSY.add(function (S) {
             ctx.fillRect(0, self.get('y'), self.get('x'), self.get('h'));
             ctx.fillRect(self.get('x') + self.get('w'), self.get('y'), canvasW - self.get('x') - self.get('w'), self.get('h'));
             ctx.fillRect(0, self.get('y') + self.get('h'), canvasW, canvasH - self.get('y') - self.get('h'));
-
-            //这种形式图像会动
-            /*
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-            ctx.fillRect(0, 0, canvasW, canvasH);
-            var r = image.width / canvasW;
-            ctx.drawImage(image,
-                self.get('x') * r,
-                self.get('y') * r,
-                self.get('w') * r,
-                self.get('h') * r,
-                self.get('x'),
-                self.get('y'),
-                self.get('w'),
-                self.get('h')
-            );*/
 
             /**
              * 鼠标形状
@@ -132,30 +116,35 @@ KISSY.add(function (S) {
         resize:function (iMouseX, iMouseY) {
             var self = this;
             var iFW, iFH, iFX, iFY;
+
             if (self.bDrag[0]) {
-                iFX = iMouseX;
-                iFY = iMouseY;
-                iFW = self.get('w') + self.get('x') - iMouseX;
-                iFH = self.get('h') + self.get('y') - iMouseY;
+                iFX = Math.min(iMouseX, self.get('w') + self.get('x') - self.get('minWidth'));
+                iFY = Math.min(iMouseY, self.get('h') + self.get('y') - self.get('minHeight'));
+                iFW = self.get('w') + self.get('x') - iFX;
+                iFH = self.get('h') + self.get('y') - iFY;
             } else if (self.bDrag[1]) {
                 iFX = self.get('x');
-                iFY = iMouseY;
-                iFW = iMouseX - self.get('x');
-                iFH = self.get('h') + self.get('y') - iMouseY;
+                iFY = Math.min(iMouseY, self.get('h') + self.get('y') - self.get('minHeight'));
+                iFW = iMouseX - iFX;
+                iFH = self.get('h') + self.get('y') - iFY;
             } else if (self.bDrag[2]) {
                 iFX = self.get('x');
                 iFY = self.get('y');
-                iFW = iMouseX - self.get('x');
-                iFH = iMouseY - self.get('y');
+                iFW = iMouseX - iFX;
+                iFH = iMouseY - iFY;
             } else if (self.bDrag[3]) {
-                iFX = iMouseX;
+                iFX = Math.min(iMouseX, self.get('w') + self.get('x') - self.get('minWidth'));
                 iFY = self.get('y');
-                iFW = self.get('w') + self.get('x') - iMouseX;
-                iFH = iMouseY - self.get('y');
+                iFW = self.get('w') + self.get('x') - iFX;
+                iFH = iMouseY - iFY;
             }
             //固定比例
             if (self.get("ratio")) {
-                iFH = iFW * self.get('h') / self.get("w");
+                //水平方向会移动
+                var r = self.get('pw') / self.get("ph");
+                if(iFW / iFH  !== r){
+                    iFW = iFH * r;
+                }
             }
             self.set({
                 w:iFW, x:iFX, h:iFH, y:iFY
@@ -178,8 +167,7 @@ KISSY.add(function (S) {
                 iMouseY > self.get('y') + self.csize &&
                 iMouseY < self.get('y') + self.get('h') - self.csize) {
                 code = 0;
-            }
-            if (iMouseX > self.get('x') - self.csize && iMouseX < self.get('x') + self.csize &&
+            }else if (iMouseX > self.get('x') - self.csize && iMouseX < self.get('x') + self.csize &&
                 iMouseY > self.get('y') - self.csize && iMouseY < self.get('y') + self.csize) {
                 code = 1;
             } else if (iMouseX > self.get('x') + self.get('w') - self.csize && iMouseX < self.get('x') + self.get('w') + self.csize &&
@@ -213,11 +201,11 @@ KISSY.add(function (S) {
                     break;
                 case 1:
                 case 3:
-                    self.cursor = 'nw-resize';
+                    self.cursor = self.get('resizable') ? 'nw-resize' : 'default';
                     break;
                 case 2:
                 case 4:
-                    self.cursor = 'ne-resize';
+                    self.cursor = self.get('resizable') ? 'ne-resize' : 'default';
                     break;
                 default:
                     self.cursor = 'default';

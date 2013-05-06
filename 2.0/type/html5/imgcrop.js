@@ -348,7 +348,7 @@ KISSY.add(function (S, Preview, Selection) {
                 self.theSelection.move(iMouseX - self.iMouseX, iMouseY - self.iMouseY);
             }
             // in case of dragging of resize cubes
-            if (self.theSelection.canResize()) {
+            if (self.get('resizable') && self.theSelection.canResize()) {
                 self.theSelection.resize(iMouseX, iMouseY);
             }
             self._drawScene();
@@ -367,8 +367,11 @@ KISSY.add(function (S, Preview, Selection) {
             //缓存坐标，move时需要
             theSelection.set({
                 px:theSelection.get('x'),
-                py:theSelection.get('y')
+                py:theSelection.get('y'),
+                pw:theSelection.get('w'),
+                ph:theSelection.get('h')
             }, {silent:true});
+
             var code = theSelection.registerPointPos(iMouseX, iMouseY);
             theSelection.markByCode(code);
             $(document).on('mousemove', self._handleMouseMove, self);
@@ -430,7 +433,6 @@ KISSY.add(function (S, Preview, Selection) {
             if (e.targetTouches.length == 1) {
                 e.preventDefault(); // 阻止浏览器默认事件，重要
                 var touch = e.targetTouches[0];
-                var theSelection = self.theSelection;
                 var canvasOffset = self.canvas.offset();
                 var iMouseX = Math.min(Math.max(touch.pageX - canvasOffset.left, 0), self.canvasW);
                 var iMouseY = Math.min(Math.max(touch.pageY - canvasOffset.top, 0), self.canvasH);
@@ -439,7 +441,7 @@ KISSY.add(function (S, Preview, Selection) {
                     self.theSelection.move(iMouseX - self.iMouseX, iMouseY - self.iMouseY);
                 }
                 // in case of dragging of resize cubes
-                if (self.theSelection.canResize()) {
+                if (self.get('resizable') && self.theSelection.canResize()) {
                     self.theSelection.resize(iMouseX, iMouseY);
                 }
                 self._drawScene();
