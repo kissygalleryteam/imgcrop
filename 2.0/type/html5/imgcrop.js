@@ -103,6 +103,18 @@ KISSY.add(function (S, Preview, Selection) {
             value:'#fff'
         },
         /**
+         *  遮罩颜色
+         */
+        maskColor:{
+            value:'#000'
+        },
+        /**
+         * 遮罩透明度
+         */
+        maskOpacity:{
+            value:'0.5'
+        },
+        /**
          * 预览窗口，不需要可以不配置{HTMLElement|NodeList}
          */
         previewEl:{
@@ -212,6 +224,8 @@ KISSY.add(function (S, Preview, Selection) {
                         self.theSelection.set('y', value[1]);
                         break;
                     case 'borderColor':
+                    case 'maskColor':
+                    case 'maskOpacity':
                     case 'cubesColor':
                     case 'resizable':
                     case 'minWidth':
@@ -259,6 +273,8 @@ KISSY.add(function (S, Preview, Selection) {
                 minHeight:self.get('minHeight'),
                 resizable:self.get('resizable'),
                 borderColor:self.get('borderColor'),
+                maskColor:self.get('maskColor'),
+                maskOpacity:self.get('maskOpacity'),
                 constraint:[self.canvasW, self.canvasH],
                 ratio : self.get("ratio")
             });
@@ -300,7 +316,7 @@ KISSY.add(function (S, Preview, Selection) {
             /**
              * 解决拖拽时鼠标形状问题
              */
-            self.canvas.detach("selectstart mousedown", _doPreventDefault).on("selectstart mousedown", _doPreventDefault);
+            self.canvas.on("selectstart mousedown", _doPreventDefault);
             function _doPreventDefault(e) {
                 e.preventDefault();
                 return false;

@@ -1,7 +1,6 @@
 .crop-point {
     position: absolute;
     background: #FFF;
-    border: 1px solid #666;
     width: 6px;
     height: 6px;
     z-index: 5000;

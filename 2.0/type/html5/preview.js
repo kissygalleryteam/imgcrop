@@ -67,8 +67,14 @@ KISSY.add(function (S) {
             var self = this;
             // clear canvas
             self.ctx.clearRect(0, 0, self.canvasW, self.canvasH);
-            var newCoords = self._rejustSize(w * r, h * r, self.canvasW, self.canvasH);
-            self.ctx.drawImage(self.get('image'), x * r, y * r, w * r, h * r, newCoords.x, newCoords.y, newCoords.w, newCoords.h);
+            var oriCoords = {
+                x : Math.floor(x * r),
+                y : Math.floor(y * r),
+                w : Math.floor(w * r),
+                h : Math.floor(h * r)
+            };
+            var newCoords = self._rejustSize(oriCoords.w, oriCoords.h, self.canvasW, self.canvasH);
+            self.ctx.drawImage(self.get('image'), oriCoords.x, oriCoords.y, oriCoords.w, oriCoords.h, newCoords.x, newCoords.y, newCoords.w, newCoords.h);
         },
         destroy:function () {
             this.canvas.remove();

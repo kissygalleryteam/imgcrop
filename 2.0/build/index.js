@@ -79,8 +79,14 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/preview',function (S) {
             var self = this;
             // clear canvas
             self.ctx.clearRect(0, 0, self.canvasW, self.canvasH);
-            var newCoords = self._rejustSize(w * r, h * r, self.canvasW, self.canvasH);
-            self.ctx.drawImage(self.get('image'), x * r, y * r, w * r, h * r, newCoords.x, newCoords.y, newCoords.w, newCoords.h);
+            var oriCoords = {
+                x : Math.floor(x * r),
+                y : Math.floor(y * r),
+                w : Math.floor(w * r),
+                h : Math.floor(h * r)
+            };
+            var newCoords = self._rejustSize(oriCoords.w, oriCoords.h, self.canvasW, self.canvasH);
+            self.ctx.drawImage(self.get('image'), oriCoords.x, oriCoords.y, oriCoords.w, oriCoords.h, newCoords.x, newCoords.y, newCoords.w, newCoords.h);
         },
         destroy:function () {
             this.canvas.remove();
@@ -135,6 +141,12 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/selection',function (S) {
         cubesColor:{
             value:'#fff'
         },
+        maskColor:{
+            value : "#000"
+        },
+        maskOpacity:{
+            value : "0.5"
+        },
         constraint:{
             value:[10000, 10000]
         }
@@ -175,11 +187,13 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/selection',function (S) {
             ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
 
             // and make mask
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillStyle = self.get('maskColor');
+            ctx.globalAlpha = self.get('maskOpacity');
             ctx.fillRect(0, 0, canvasW, self.get('y'));
             ctx.fillRect(0, self.get('y'), self.get('x'), self.get('h'));
             ctx.fillRect(self.get('x') + self.get('w'), self.get('y'), canvasW - self.get('x') - self.get('w'), self.get('h'));
             ctx.fillRect(0, self.get('y') + self.get('h'), canvasW, canvasH - self.get('y') - self.get('h'));
+            ctx.globalAlpha = '1';
 
             /**
              * 鼠标形状
@@ -247,8 +261,8 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/selection',function (S) {
         move:function (diffX, diffY) {
             var self = this;
             self.set({
-                x:Math.min(Math.max(self.get('px') + diffX, 0), self.get('constraint')[0] - self.get('w')),
-                y:Math.min(Math.max(self.get('py') + diffY, 0), self.get('constraint')[1] - self.get('h'))
+                x:Math.min(Math.max(self.get('px') + diffX, 0), self.get('constraint')[0] - self.get('pw')),
+                y:Math.min(Math.max(self.get('py') + diffY, 0), self.get('constraint')[1] - self.get('ph'))
             });
             self.fire(self.event.DRAG);
         },
@@ -312,7 +326,7 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/selection',function (S) {
         },
         reset:function () {
             this.bDragAll = false;
-            for (i = 0; i < this.bDrag.length; i++) {
+            for (var i = 0; i < this.bDrag.length; i++) {
                 this.bDrag[i] = false;
             }
         }
@@ -427,6 +441,18 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/imgcrop',function (S, Preview, Selecti
             value:'#fff'
         },
         /**
+         *  遮罩颜色
+         */
+        maskColor:{
+            value:'#000'
+        },
+        /**
+         * 遮罩透明度
+         */
+        maskOpacity:{
+            value:'0.5'
+        },
+        /**
          * 预览窗口，不需要可以不配置{HTMLElement|NodeList}
          */
         previewEl:{
@@ -536,6 +562,8 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/imgcrop',function (S, Preview, Selecti
                         self.theSelection.set('y', value[1]);
                         break;
                     case 'borderColor':
+                    case 'maskColor':
+                    case 'maskOpacity':
                     case 'cubesColor':
                     case 'resizable':
                     case 'minWidth':
@@ -583,6 +611,8 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/imgcrop',function (S, Preview, Selecti
                 minHeight:self.get('minHeight'),
                 resizable:self.get('resizable'),
                 borderColor:self.get('borderColor'),
+                maskColor:self.get('maskColor'),
+                maskOpacity:self.get('maskOpacity'),
                 constraint:[self.canvasW, self.canvasH],
                 ratio : self.get("ratio")
             });
@@ -624,7 +654,7 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/imgcrop',function (S, Preview, Selecti
             /**
              * 解决拖拽时鼠标形状问题
              */
-            self.canvas.detach("selectstart mousedown", _doPreventDefault).on("selectstart mousedown", _doPreventDefault);
+            self.canvas.on("selectstart mousedown", _doPreventDefault);
             function _doPreventDefault(e) {
                 e.preventDefault();
                 return false;
@@ -1450,11 +1480,23 @@ KISSY.add('gallery/imgcrop/2.0/type/normal/imgcrop',function (S, Resize, Drag) {
         ratio:{
             value:false
         },
-        opacity:{
-            value:50
+        maskOpacity:{
+            value:0.5
         },
-        color:{
+        maskColor:{
             value:'#000'
+        },
+        /**
+         * 边框颜色
+         */
+        borderColor:{
+            value:'#fff'
+        },
+        /**
+         * 小方块颜色
+         */
+        cubesColor:{
+            value:'#fff'
         },
         minHeight:{
             value:100
@@ -1518,8 +1560,10 @@ KISSY.add('gallery/imgcrop/2.0/type/normal/imgcrop',function (S, Resize, Drag) {
                 'top':self.get('initialXY')[1],
                 'width':self.get('initWidth'),
                 'height':self.get('initHeight'),
-                'display':'none'
+                'display':'none',
+                'border-color':self.get('borderColor')
             });
+            _el.all('.crop-point').css('background-color',self.get('cubesColor'));
             return _el;
         },
         _loadImage:function () {
@@ -1586,7 +1630,7 @@ KISSY.add('gallery/imgcrop/2.0/type/normal/imgcrop',function (S, Resize, Drag) {
             self.wrap.css({
                 position:'relative',
                 overflow:'hidden',
-                background:self.get("color")
+                background:self.get("maskColor")
             });
             self.el.css('z-index', 200);
             DOM.css(self._layCropper, {
@@ -1597,7 +1641,7 @@ KISSY.add('gallery/imgcrop/2.0/type/normal/imgcrop',function (S, Resize, Drag) {
             });
             DOM.css(self._layBase, {
                 position:'absolute',
-                opacity:self.get("opacity") / 100,
+                opacity:self.get("maskOpacity"),
                 top:0,
                 left:0
             });

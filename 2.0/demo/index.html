@@ -43,18 +43,18 @@
 <div id="J_PrevBox" class="preview"></div>
 <textarea id="J_InfoBox" class="infobox"></textarea>
 <script>
-    if (KISSY.Config.debug == true) {
-        KISSY.config({
-            packages:[
-                {
-                    name:"gallery",
-                    tag:"2013050055",
-                    path:"../../../../",
-                    charset:"utf-8"
-                }
-            ]
-        });
-    }
+if (KISSY.Config.debug == true) {
+    KISSY.config({
+        packages:[
+            {
+                name:"gallery",
+                tag:"20130507",
+                path:"../../../../",
+                charset:"utf-8"
+            }
+        ]
+    });
+}
 </script>
 
 <script>
@@ -69,12 +69,16 @@
             minWidth:100,
             areaWidth:400,
             areaHeight:400,
-            previewEl:"#J_PrevBox",
+            previewEl:"#J_PrevBox",//不需要不配置
             viewWidth:200,
             viewHeight:200,
             touchable:true,
             resizable : true,
             ratio:true,
+            maskColor:'#000',
+            maskOpacity:'0.6',
+            cubesColor:'#fff',
+            borderColor:'#fff',
             url:'http://img01.taobaocdn.com/imgextra/i1/14888019145001501/T1_iIPXl8dXXXXXXXX_!!855984888-0-pix.jpg'
         });
         crop.on('imgload drag resize', function () {

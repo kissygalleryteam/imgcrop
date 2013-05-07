@@ -42,6 +42,12 @@ KISSY.add(function (S) {
         cubesColor:{
             value:'#fff'
         },
+        maskColor:{
+            value : "#000"
+        },
+        maskOpacity:{
+            value : "0.5"
+        },
         constraint:{
             value:[10000, 10000]
         }
@@ -82,11 +88,13 @@ KISSY.add(function (S) {
             ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
 
             // and make mask
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillStyle = self.get('maskColor');
+            ctx.globalAlpha = self.get('maskOpacity');
             ctx.fillRect(0, 0, canvasW, self.get('y'));
             ctx.fillRect(0, self.get('y'), self.get('x'), self.get('h'));
             ctx.fillRect(self.get('x') + self.get('w'), self.get('y'), canvasW - self.get('x') - self.get('w'), self.get('h'));
             ctx.fillRect(0, self.get('y') + self.get('h'), canvasW, canvasH - self.get('y') - self.get('h'));
+            ctx.globalAlpha = '1';
 
             /**
              * 鼠标形状
@@ -154,8 +162,8 @@ KISSY.add(function (S) {
         move:function (diffX, diffY) {
             var self = this;
             self.set({
-                x:Math.min(Math.max(self.get('px') + diffX, 0), self.get('constraint')[0] - self.get('w')),
-                y:Math.min(Math.max(self.get('py') + diffY, 0), self.get('constraint')[1] - self.get('h'))
+                x:Math.min(Math.max(self.get('px') + diffX, 0), self.get('constraint')[0] - self.get('pw')),
+                y:Math.min(Math.max(self.get('py') + diffY, 0), self.get('constraint')[1] - self.get('ph'))
             });
             self.fire(self.event.DRAG);
         },
@@ -219,7 +227,7 @@ KISSY.add(function (S) {
         },
         reset:function () {
             this.bDragAll = false;
-            for (i = 0; i < this.bDrag.length; i++) {
+            for (var i = 0; i < this.bDrag.length; i++) {
                 this.bDrag[i] = false;
             }
         }

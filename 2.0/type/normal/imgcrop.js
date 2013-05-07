@@ -38,11 +38,23 @@ KISSY.add(function (S, Resize, Drag) {
         ratio:{
             value:false
         },
-        opacity:{
-            value:50
+        maskOpacity:{
+            value:0.5
         },
-        color:{
+        maskColor:{
             value:'#000'
+        },
+        /**
+         * 边框颜色
+         */
+        borderColor:{
+            value:'#fff'
+        },
+        /**
+         * 小方块颜色
+         */
+        cubesColor:{
+            value:'#fff'
         },
         minHeight:{
             value:100
@@ -106,8 +118,10 @@ KISSY.add(function (S, Resize, Drag) {
                 'top':self.get('initialXY')[1],
                 'width':self.get('initWidth'),
                 'height':self.get('initHeight'),
-                'display':'none'
+                'display':'none',
+                'border-color':self.get('borderColor')
             });
+            _el.all('.crop-point').css('background-color',self.get('cubesColor'));
             return _el;
         },
         _loadImage:function () {
@@ -174,7 +188,7 @@ KISSY.add(function (S, Resize, Drag) {
             self.wrap.css({
                 position:'relative',
                 overflow:'hidden',
-                background:self.get("color")
+                background:self.get("maskColor")
             });
             self.el.css('z-index', 200);
             DOM.css(self._layCropper, {
@@ -185,7 +199,7 @@ KISSY.add(function (S, Resize, Drag) {
             });
             DOM.css(self._layBase, {
                 position:'absolute',
-                opacity:self.get("opacity") / 100,
+                opacity:self.get("maskOpacity"),
                 top:0,
                 left:0
             });
