@@ -1,7 +1,7 @@
 {
     "name": "imgcrop",
     "version":"2.1",
-    "author":{"name":"元泉","email":"348225669@qq.com","page":"https://github.com/wuxiaorui86"},
+    "author":{"name":"元泉","email":"yuanquan.wxr@taobao.com","page":"https://github.com/wuxiaorui86"},
     "cover":"http://img02.taobaocdn.com/tps/i2/T1ZC5xXyXbXXc6VVHG-503-566.jpg",
     "desc":"图像剪裁组件"
 }
