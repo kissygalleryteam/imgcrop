@@ -1,20 +1,20 @@
 /*
 combined files : 
 
-gallery/imgcrop/2.0/type/html5/preview
-gallery/imgcrop/2.0/type/html5/selection
-gallery/imgcrop/2.0/type/html5/imgcrop
-gallery/imgcrop/2.0/type/normal/resizable
-gallery/imgcrop/2.0/type/normal/dragable
-gallery/imgcrop/2.0/type/normal/imgcrop
-gallery/imgcrop/2.0/index
+gallery/imgcrop/2.1/type/html5/preview
+gallery/imgcrop/2.1/type/html5/selection
+gallery/imgcrop/2.1/type/html5/imgcrop
+gallery/imgcrop/2.1/type/normal/resizable
+gallery/imgcrop/2.1/type/normal/dragable
+gallery/imgcrop/2.1/type/normal/imgcrop
+gallery/imgcrop/2.1/index
 
 */
 /**
  * @Preview 预览模块
  * @author 元泉 2013-5-4
  */
-KISSY.add('gallery/imgcrop/2.0/type/html5/preview',function (S) {
+KISSY.add('gallery/imgcrop/2.1/type/html5/preview',function (S) {
     var $ = S.all;
     //预览对象
     function Preview() {
@@ -101,7 +101,7 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/preview',function (S) {
  * @Selection 图像选择模块
  * @author 元泉 2013-5-4
  */
-KISSY.add('gallery/imgcrop/2.0/type/html5/selection',function (S) {
+KISSY.add('gallery/imgcrop/2.1/type/html5/selection',function (S) {
     //选择对象
     function Selection() {
         Selection.superclass.constructor.apply(this, arguments);
@@ -338,9 +338,9 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/selection',function (S) {
 
 /**
  * @ImgCrop 图像剪裁组件，基于canvas
- * @author 元泉 2013-5-4
+ * @author 元泉 2013-5-8
  */
-KISSY.add('gallery/imgcrop/2.0/type/html5/imgcrop',function (S, Preview, Selection) {
+KISSY.add('gallery/imgcrop/2.1/type/html5/imgcrop',function (S, Preview, Selection) {
     var $ = S.all;
 
     /**
@@ -354,7 +354,6 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/imgcrop',function (S, Preview, Selecti
         this.ctx = this.canvas[0].getContext('2d');
         this.image = new Image();
         this.preview = null;
-        this._init();
     }
 
     /**
@@ -521,6 +520,7 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/imgcrop',function (S, Preview, Selecti
          */
         _bind:function () {
             var self = this;
+            self._unBind();
             self.canvas.on('mousemove', self._handleHover, self);
             self.canvas.on('mousedown', self._handleMouseDown, self);
             $(document).on('mouseup', self._handleMouseUp, self);
@@ -572,7 +572,7 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/imgcrop',function (S, Preview, Selecti
                         self.theSelection.set(attr, value);
                         break;
                     default:
-                        self.reset();
+                        //self.reset();
                 }
             });
         },
@@ -878,6 +878,12 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/imgcrop',function (S, Preview, Selecti
             });
         },
         /**
+         * 渲染
+         */
+        render : function(){
+            this._init();
+        },
+        /**
          * 重新初始化
          */
         reset:function () {
@@ -955,7 +961,7 @@ KISSY.add('gallery/imgcrop/2.0/type/html5/imgcrop',function (S, Preview, Selecti
 /**
  * resize组件
  */
-KISSY.add('gallery/imgcrop/2.0/type/normal/resizable',function (S) {
+KISSY.add('gallery/imgcrop/2.1/type/normal/resizable',function (S) {
     var Event = S.Event,
         DOM = S.DOM;
     //缩放程序
@@ -1302,7 +1308,7 @@ KISSY.add('gallery/imgcrop/2.0/type/normal/resizable',function (S) {
 /**
  *拖拽组件
  */
-KISSY.add('gallery/imgcrop/2.0/type/normal/dragable',function (S) {
+KISSY.add('gallery/imgcrop/2.1/type/normal/dragable',function (S) {
 	var Event = S.Event,
 	DOM = S.DOM,
 	ie = S.UA.ie;
@@ -1445,14 +1451,13 @@ KISSY.add('gallery/imgcrop/2.0/type/normal/dragable',function (S) {
  * author 元泉
  * date 2013-3-31
  */
-KISSY.add('gallery/imgcrop/2.0/type/normal/imgcrop',function (S, Resize, Drag) {
+KISSY.add('gallery/imgcrop/2.1/type/normal/imgcrop',function (S, Resize, Drag) {
     var $ = S.all,
         Event = S.Event,
         DOM = S.DOM;
 
     function ImgCrop(option) {
         ImgCrop.superclass.constructor.apply(this, arguments);
-        this._init();
     }
 
     ImgCrop.ATTRS = {
@@ -1525,10 +1530,14 @@ KISSY.add('gallery/imgcrop/2.0/type/normal/imgcrop',function (S, Resize, Drag) {
         },
         _bind:function () {
             var self = this;
-            self.on('*Change', function (e) {
-                self._loadImage();
-            });
+            self._unbind();
+            self.on('*Change', self._loadImage, self);
             Event.on(self._tempImg, 'load', self._onImgLoad, self);
+        },
+        _unbind : function(){
+            var self = this;
+            self.detach('*Change', self._loadImage, self);
+            Event.detach(self._tempImg, 'load', self._onImgLoad, self);
         },
         _render:function () {
             var self = this;
@@ -1804,6 +1813,9 @@ KISSY.add('gallery/imgcrop/2.0/type/normal/imgcrop',function (S, Resize, Drag) {
             });
             this._setPos();
         },
+        render : function(){
+            this._init();
+        },
         show:function () {
             this.area.show();
         },
@@ -1842,7 +1854,7 @@ KISSY.add('gallery/imgcrop/2.0/type/normal/imgcrop',function (S, Resize, Drag) {
  * date 2013-5-4
  */
 var __surportCanvas = 'getContext' in document.createElement('canvas');
-KISSY.add('gallery/imgcrop/2.0/index',function (S, ImgCrop) {
+KISSY.add('gallery/imgcrop/2.1/index',function (S, ImgCrop) {
 
     function Index(option) {
         return new ImgCrop(option);
