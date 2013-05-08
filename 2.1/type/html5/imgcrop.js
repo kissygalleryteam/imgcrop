@@ -1,6 +1,6 @@
 /**
  * @ImgCrop 图像剪裁组件，基于canvas
- * @author 元泉 2013-5-4
+ * @author 元泉 2013-5-8
  */
 KISSY.add(function (S, Preview, Selection) {
     var $ = S.all;
@@ -16,7 +16,6 @@ KISSY.add(function (S, Preview, Selection) {
         this.ctx = this.canvas[0].getContext('2d');
         this.image = new Image();
         this.preview = null;
-        this._init();
     }
 
     /**
@@ -183,6 +182,7 @@ KISSY.add(function (S, Preview, Selection) {
          */
         _bind:function () {
             var self = this;
+            self._unBind();
             self.canvas.on('mousemove', self._handleHover, self);
             self.canvas.on('mousedown', self._handleMouseDown, self);
             $(document).on('mouseup', self._handleMouseUp, self);
@@ -234,7 +234,7 @@ KISSY.add(function (S, Preview, Selection) {
                         self.theSelection.set(attr, value);
                         break;
                     default:
-                        self.reset();
+                        //self.reset();
                 }
             });
         },
@@ -538,6 +538,12 @@ KISSY.add(function (S, Preview, Selection) {
                 top:(self.container.height() - self.canvasH) / 2,
                 left:(self.container.width() - self.canvasW) / 2
             });
+        },
+        /**
+         * 渲染
+         */
+        render : function(){
+            this._init();
         },
         /**
          * 重新初始化

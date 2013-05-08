@@ -10,7 +10,6 @@ KISSY.add(function (S, Resize, Drag) {
 
     function ImgCrop(option) {
         ImgCrop.superclass.constructor.apply(this, arguments);
-        this._init();
     }
 
     ImgCrop.ATTRS = {
@@ -83,10 +82,14 @@ KISSY.add(function (S, Resize, Drag) {
         },
         _bind:function () {
             var self = this;
-            self.on('*Change', function (e) {
-                self._loadImage();
-            });
+            self._unbind();
+            self.on('*Change', self._loadImage, self);
             Event.on(self._tempImg, 'load', self._onImgLoad, self);
+        },
+        _unbind : function(){
+            var self = this;
+            self.detach('*Change', self._loadImage, self);
+            Event.detach(self._tempImg, 'load', self._onImgLoad, self);
         },
         _render:function () {
             var self = this;
@@ -361,6 +364,9 @@ KISSY.add(function (S, Resize, Drag) {
                 left:x
             });
             this._setPos();
+        },
+        render : function(){
+            this._init();
         },
         show:function () {
             this.area.show();
