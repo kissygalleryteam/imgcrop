@@ -9,7 +9,6 @@ KISSY.add(function (S) {
         Preview.superclass.constructor.apply(this, arguments);
         this.canvas = $('<canvas>');
         this.ctx = this.canvas[0].getContext('2d');
-        this.container = $(this.get('previewEl'));
         this._init();
     }
 
@@ -29,6 +28,7 @@ KISSY.add(function (S) {
     };
     S.extend(Preview, S.Base, {
         _init:function () {
+            this.container = $(this.get('previewEl'));
             this._build();
         },
         _build:function () {

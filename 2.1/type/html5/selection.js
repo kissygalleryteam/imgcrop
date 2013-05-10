@@ -6,7 +6,7 @@ KISSY.add(function (S) {
     //选择对象
     function Selection() {
         Selection.superclass.constructor.apply(this, arguments);
-        this.csize = 4; // resize cubes size
+        this.csize = 3; // resize cubes size
         this.bDrag = [false, false, false, false]; // drag statuses
         this.bDragAll = false; // drag whole selection
     }
