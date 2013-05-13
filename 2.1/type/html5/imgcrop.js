@@ -11,11 +11,9 @@ KISSY.add(function (S, Preview, Selection) {
      */
     function ImgCrop() {
         ImgCrop.superclass.constructor.apply(this, arguments);
-        this.container = $(this.get('areaEl'));
         this.canvas = $('<canvas>');
         this.ctx = this.canvas[0].getContext('2d');
         this.image = new Image();
-        this.preview = null;
     }
 
     /**
@@ -164,6 +162,8 @@ KISSY.add(function (S, Preview, Selection) {
          */
         _init:function () {
             var self = this;
+            // 该操作从构造函数迁移到init中，在构造函数中的话，如果areaEl新赋值会出问题
+            self.container = $(self.get('areaEl'));
             var image = self.image;
             image.onload = function () {
                 self._build();
@@ -273,6 +273,7 @@ KISSY.add(function (S, Preview, Selection) {
                 minHeight:self.get('minHeight'),
                 resizable:self.get('resizable'),
                 borderColor:self.get('borderColor'),
+                cubesColor:self.get('cubesColor'),
                 maskColor:self.get('maskColor'),
                 maskOpacity:self.get('maskOpacity'),
                 constraint:[self.canvasW, self.canvasH],

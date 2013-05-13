@@ -111,9 +111,38 @@ KISSY.add(function (S, Resize, Drag) {
             var self = this;
             var _el = self.el = $('<div class="crop">');
             if (self.get("resizable")) {
-                S.each(['lt', 't', 'rt', 'r', 'rb', 'b', 'lb', 'l'], function (id) {
-                    _el.append($('<div class="crop-point point-' + id + '">'));
+                S.each(['lt', 'rt', 'rb', 'lb', 't'], function (pos) {
+                    _el.append($('<div class="cubes cubes-' + pos + '">'));
                 });
+                _el.all('.cubes').css({
+                    'position': 'absolute',
+                    'background-color': self.get('cubesColor'),
+                    'width': 6,
+                    'height': 6,
+                    'font-size': 0,
+                    'line-height': 0
+                });
+                _el.all(".cubes-lt").css({
+                    left : -4,
+                    top  : -4,
+                    cursor : 'nw-resize'
+                });
+                _el.all(".cubes-rt").css({
+                    right : -4,
+                    top  : -4,
+                    cursor : 'ne-resize'
+                });
+                _el.all(".cubes-lb").css({
+                    left : -4,
+                    bottom  : -4,
+                    cursor : 'ne-resize'
+                });
+                _el.all(".cubes-rb").css({
+                    right : -4,
+                    bottom  : -4,
+                    cursor : 'nw-resize'
+                });
+                _el.all(".cubes-t").hide();
             }
             _el.css({
                 'position':'absolute',
@@ -122,9 +151,11 @@ KISSY.add(function (S, Resize, Drag) {
                 'width':self.get('initWidth'),
                 'height':self.get('initHeight'),
                 'display':'none',
-                'border-color':self.get('borderColor')
+                'cursor' : 'move',
+                'background': "url('#')",
+                'border':'1px solid '+self.get('borderColor')
             });
-            _el.all('.crop-point').css('background-color',self.get('cubesColor'));
+
             return _el;
         },
         _loadImage:function () {
