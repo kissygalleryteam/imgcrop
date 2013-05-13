@@ -71,14 +71,14 @@ KISSY.add(function (S) {
                 Scale:false, //是否按比例缩放
                 Ratio:0, //缩放比例(宽/高)
                 Points:{
-                    Right:".point-r",
-                    Left:".point-l",
-                    Up:".point-t",
-                    Down:".point-b",
-                    RightDown:".point-rb",
-                    LeftDown:".point-lb",
-                    RightUp:".point-rt",
-                    LeftUp:".point-lt"
+                    Right:".cubes-t",
+                    Left:".cubes-t",
+                    Up:".cubes-t",
+                    Down:".cubes-t",
+                    RightDown:".cubes-rb",
+                    LeftDown:".cubes-lb",
+                    RightUp:".cubes-rt",
+                    LeftUp:".cubes-lt"
                 },
                 onResize:function () {
                 },
