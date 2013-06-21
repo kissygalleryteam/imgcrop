@@ -165,6 +165,7 @@ KISSY.add(function (S) {
                 x:Math.min(Math.max(self.get('px') + diffX, 0), self.get('constraint')[0] - self.get('pw')),
                 y:Math.min(Math.max(self.get('py') + diffY, 0), self.get('constraint')[1] - self.get('ph'))
             });
+			
             self.fire(self.event.DRAG);
         },
         registerPointPos:function (iMouseX, iMouseY) {

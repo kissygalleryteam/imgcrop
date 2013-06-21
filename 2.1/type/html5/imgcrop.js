@@ -233,8 +233,6 @@ KISSY.add(function (S, Preview, Selection) {
                     case 'ratio':
                         self.theSelection.set(attr, value);
                         break;
-                    default:
-                        //self.reset();
                 }
             });
         },
@@ -412,12 +410,26 @@ KISSY.add(function (S, Preview, Selection) {
          */
         _bindTouch:function () {
             var self = this;
+			self._unBindTouch();
             self.canvas.on('touchstart', self._handleTouchStart, self);
             self.canvas.on('touchmove', self._handleTouchMove, self);
             self.canvas.on('touchend', self._handleTouchEnd, self);
             self.canvas.on('pinchStart', self._handlePinchStart, self);
             self.canvas.on('pinch', self._handlePinch, self);
             self.canvas.on('pinchEnd', self._handlePinchEnd, self);
+        },
+		/**
+         * 绑定touch and pinch事件
+         * @private
+         */
+        _unBindTouch:function () {
+            var self = this;
+            self.canvas.detach('touchstart', self._handleTouchStart, self);
+            self.canvas.detach('touchmove', self._handleTouchMove, self);
+            self.canvas.detach('touchend', self._handleTouchEnd, self);
+            self.canvas.detach('pinchStart', self._handlePinchStart, self);
+            self.canvas.detach('pinch', self._handlePinch, self);
+            self.canvas.detach('pinchEnd', self._handlePinchEnd, self);
         },
         /**
          * TouchStart回调
@@ -434,8 +446,10 @@ KISSY.add(function (S, Preview, Selection) {
             //缓存坐标，move时需要
             theSelection.set({
                 px:theSelection.get('x'),
-                py:theSelection.get('y')
-            }, {silent:true});
+                py:theSelection.get('y'),
+				pw:theSelection.get('w'),
+                ph:theSelection.get('h')
+            });
             var code = theSelection.registerPointPos(iMouseX, iMouseY);
             theSelection.markByCode(code);
             self.fire(self.event.START_TOUCH, e);
