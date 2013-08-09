@@ -51,7 +51,7 @@ if (KISSY.Config.debug == true) {
         packages:[
             {
                 name:"gallery",
-                tag:"20130510",
+                tag:KISSY.now(),
                 path:"../../../../",
                 charset:"utf-8"
             }
@@ -90,12 +90,6 @@ if (KISSY.Config.debug == true) {
             S.log(S.JSON.stringify(crop.getOriginalSize()));
             S.log(S.JSON.stringify(crop.getDisplaySize()));
         });
-		
-		crop.on('dragstart', function (e) {
-            S.log(e.type);
-        });
-
-        //crop.set("resizable", false);
 
         crop.render();
     });
