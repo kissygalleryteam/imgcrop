@@ -1,6 +1,6 @@
 /**
  * @Selection 图像选择模块
- * @author 元泉 2013-5-4
+ * @author 元泉 2013-8-17
  */
 KISSY.add(function (S) {
     //选择对象
@@ -148,11 +148,12 @@ KISSY.add(function (S) {
             }
             //固定比例
             if (self.get("ratio")) {
-                //水平方向会移动
                 var r = self.get('pw') / self.get("ph");
-                if(iFW / iFH  !== r){
-                    iFW = iFH * r;
-                }
+                if(iFW / iFH  < r){
+					iFH = iFW / r;
+                }else{
+					iFW = iFH * r;
+				}
             }
             self.set({
                 w:iFW, x:iFX, h:iFH, y:iFY
@@ -237,3 +238,9 @@ KISSY.add(function (S) {
 }, {
     attach:false
 });
+
+
+/*
+ * note:
+ * 8-17 修复固定比例剪裁resize到边缘变形bug
+ */

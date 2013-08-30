@@ -33,6 +33,15 @@
         width: 300px;
         height: 300px;
     }
+	#qrcode{
+		position:fixed;
+		right:0;
+		bottom:0;
+		width:100px;
+		height:100px;
+		padding:5px;
+		background:#fff;
+	}
 </style>
 </head>
 <body>
@@ -43,7 +52,7 @@
 <div id="J_PrevBox" class="preview"></div>
 <textarea id="J_InfoBox" class="infobox"></textarea>
 
-
+<div id="qrcode"></div>
 
 <script>
 if (KISSY.Config.debug == true) {
@@ -58,10 +67,19 @@ if (KISSY.Config.debug == true) {
         ]
     });
 }
+
+KISSY.use('gallery/qrcode/1.0/', function (S, QRCode) {
+	var qrcode = new QRCode(document.getElementById("qrcode"), {
+		width : 100,
+		height : 100
+	});
+	qrcode.makeCode(location.href);
+});
+
 </script>
 
 <script>
-    KISSY.use('gallery/imgcrop/2.1/index', function (S, ImgCrop) {
+    KISSY.use('gallery/imgcrop/2.1/', function (S, ImgCrop) {
         var $ = S.all;
         crop = new ImgCrop({
             areaEl:"#J_CropBox",
