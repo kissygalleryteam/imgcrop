@@ -99,7 +99,7 @@ KISSY.add('gallery/imgcrop/2.1/type/html5/preview',function (S) {
 
 /**
  * @Selection 图像选择模块
- * @author 元泉 2013-5-4
+ * @author 元泉 2013-8-17
  */
 KISSY.add('gallery/imgcrop/2.1/type/html5/selection',function (S) {
     //选择对象
@@ -247,11 +247,12 @@ KISSY.add('gallery/imgcrop/2.1/type/html5/selection',function (S) {
             }
             //固定比例
             if (self.get("ratio")) {
-                //水平方向会移动
                 var r = self.get('pw') / self.get("ph");
-                if(iFW / iFH  !== r){
-                    iFW = iFH * r;
-                }
+                if(iFW / iFH  < r){
+					iFH = iFW / r;
+                }else{
+					iFW = iFH * r;
+				}
             }
             self.set({
                 w:iFW, x:iFX, h:iFH, y:iFY
@@ -264,6 +265,7 @@ KISSY.add('gallery/imgcrop/2.1/type/html5/selection',function (S) {
                 x:Math.min(Math.max(self.get('px') + diffX, 0), self.get('constraint')[0] - self.get('pw')),
                 y:Math.min(Math.max(self.get('py') + diffY, 0), self.get('constraint')[1] - self.get('ph'))
             });
+			
             self.fire(self.event.DRAG);
         },
         registerPointPos:function (iMouseX, iMouseY) {
@@ -336,6 +338,11 @@ KISSY.add('gallery/imgcrop/2.1/type/html5/selection',function (S) {
     attach:false
 });
 
+
+/*
+ * note:
+ * 8-17 修复固定比例剪裁resize到边缘变形bug
+ */
 /**
  * @ImgCrop 图像剪裁组件，基于canvas
  * @author 元泉 2013-5-8
@@ -571,8 +578,6 @@ KISSY.add('gallery/imgcrop/2.1/type/html5/imgcrop',function (S, Preview, Selecti
                     case 'ratio':
                         self.theSelection.set(attr, value);
                         break;
-                    default:
-                        //self.reset();
                 }
             });
         },
@@ -750,12 +755,26 @@ KISSY.add('gallery/imgcrop/2.1/type/html5/imgcrop',function (S, Preview, Selecti
          */
         _bindTouch:function () {
             var self = this;
+			self._unBindTouch();
             self.canvas.on('touchstart', self._handleTouchStart, self);
             self.canvas.on('touchmove', self._handleTouchMove, self);
             self.canvas.on('touchend', self._handleTouchEnd, self);
             self.canvas.on('pinchStart', self._handlePinchStart, self);
             self.canvas.on('pinch', self._handlePinch, self);
             self.canvas.on('pinchEnd', self._handlePinchEnd, self);
+        },
+		/**
+         * 绑定touch and pinch事件
+         * @private
+         */
+        _unBindTouch:function () {
+            var self = this;
+            self.canvas.detach('touchstart', self._handleTouchStart, self);
+            self.canvas.detach('touchmove', self._handleTouchMove, self);
+            self.canvas.detach('touchend', self._handleTouchEnd, self);
+            self.canvas.detach('pinchStart', self._handlePinchStart, self);
+            self.canvas.detach('pinch', self._handlePinch, self);
+            self.canvas.detach('pinchEnd', self._handlePinchEnd, self);
         },
         /**
          * TouchStart回调
@@ -772,8 +791,10 @@ KISSY.add('gallery/imgcrop/2.1/type/html5/imgcrop',function (S, Preview, Selecti
             //缓存坐标，move时需要
             theSelection.set({
                 px:theSelection.get('x'),
-                py:theSelection.get('y')
-            }, {silent:true});
+                py:theSelection.get('y'),
+				pw:theSelection.get('w'),
+                ph:theSelection.get('h')
+            });
             var code = theSelection.registerPointPos(iMouseX, iMouseY);
             theSelection.markByCode(code);
             self.fire(self.event.START_TOUCH, e);
