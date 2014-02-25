@@ -1649,9 +1649,11 @@ KISSY.add('gallery/imgcrop/2.1/type/normal/imgcrop',function (S, Resize, Drag) {
         },
         _loadImage:function () {
             var self = this;
+            var imgUrl = self.get("url");
+            var token = imgUrl.indexOf('?') > -1 ? '&' : '?';
             self._layBase.style.visibility = self._layCropper.style.visibility = 'hidden';
             //加载图片，为了保证每次调用都能触发load事件加一个随机数
-            self._tempImg.src = self._layBase.src = self._layCropper.src = self.get("url") + "?nocache=" + S.guid();
+            self._tempImg.src = self._layBase.src = self._layCropper.src = imgUrl + token + "nocache=" + S.guid();
             if (self._view) {
                 self._view.src = self._tempImg.src;
             }
