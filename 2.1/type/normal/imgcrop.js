@@ -173,7 +173,7 @@ KISSY.add(function (S, Resize, Drag) {
             this._initStyle();
             this._setImgSize();
             this._setPos();            
-            if (this.get("ratio")) { this._adjustInitPos(); }
+            if (this.get("ratio")) { this._adjustInitSize(); }
             this._initDrag();
             this._initResize();
         },
@@ -253,7 +253,7 @@ KISSY.add(function (S, Resize, Drag) {
                 self.el.height(_wrapHeight - p.y);
             }
         },
-        _adjustInitPos:function () {
+        _adjustInitSize:function () {
             var self = this,
                 _width = self.el.width(),
                 _height = self.el.height(),
