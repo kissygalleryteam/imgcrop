@@ -172,7 +172,8 @@ KISSY.add(function (S, Resize, Drag) {
         _onImgLoad:function () {
             this._initStyle();
             this._setImgSize();
-            this._setPos();
+            this._setPos();            
+            if (this.get("ratio")) { this._adjustInitPos(); }
             this._initDrag();
             this._initResize();
         },
@@ -250,6 +251,19 @@ KISSY.add(function (S, Resize, Drag) {
             }
             if (p.y + p.h > _wrapHeight) {
                 self.el.height(_wrapHeight - p.y);
+            }
+        },
+        _adjustInitPos:function () {
+            var self = this,
+                _width = self.el.width(),
+                _height = self.el.height(),
+                _defRatio = self.get('initWidth')/self.get('initHeight'); //默认宽高比
+            if (_defRatio!=1) {
+                if (_defRatio>1) {
+                    self.el.width(_height*_defRatio);
+                } else {
+                    self.el.height(_width/_defRatio);
+                }
             }
         },
         //设置切割样式
