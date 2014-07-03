@@ -80,20 +80,20 @@ KISSY.use('gallery/qrcode/1.0/', function (S, QRCode) {
 </script>
 
 <script>
-    KISSY.use('gallery/imgcrop/2.1/', function (S, ImgCrop) {
+    KISSY.use('gallery/imgcrop/2.2/', function (S, ImgCrop) {
         var $ = S.all;
         crop = new ImgCrop({
             areaEl:"#J_CropBox",
             initialXY:[10, 10],
             initWidth:200,
-            initHeight:200,
-            minHeight:100,
-            minWidth:100,
+            initHeight:100,
+            minHeight:10,
+            minWidth:10,
             areaWidth:400,
             areaHeight:400,
             previewEl:"#J_PrevBox",//不需要不配置
             viewWidth:200,
-            viewHeight:200,
+            viewHeight:100,
             touchable:true,
             resizable : true,
             ratio:true,
