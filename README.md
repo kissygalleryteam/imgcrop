@@ -10,6 +10,9 @@ ImgCrop是一个对图片进行裁剪时选取坐标和尺寸的组件。
 [DEMO](http://gallery.kissyui.com/imgcrop/2.1/demo/index.html)
 
 ### 组件变更
+#### V2.2 change
+
+    [!] 修改预览窗口缩小bug
 
 #### V2.1 change
 
