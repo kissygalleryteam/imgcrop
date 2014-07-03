@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b5ef801a-c4d4-4647-b84f-a9ec394aea26" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/2.1/demo/index.html" afterPath="$PROJECT_DIR$/2.1/demo/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/2.2/demo/index.html" afterPath="$PROJECT_DIR$/2.2/demo/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
     </list>
     <ignored path="imgcrop.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -35,10 +34,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.html" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/2.1/demo/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="82" column="34" selection-start="1621" selection-end="1621" vertical-scroll-proportion="0.14871016" vertical-offset="1296" max-vertical-offset="2057">
+            <state line="82" column="34" selection-start="1621" selection-end="1621" vertical-scroll-proportion="-41.03846" vertical-offset="327" max-vertical-offset="2057">
               <folding />
             </state>
           </provider>
@@ -62,10 +61,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="README.md" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="README.md" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="14" column="19" selection-start="216" selection-end="216" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="510">
+            <state line="13" column="0" selection-start="196" selection-end="196" vertical-scroll-proportion="0.32262772" vertical-offset="0" max-vertical-offset="685">
               <folding />
             </state>
           </provider>
@@ -93,7 +92,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/2.1/type/html5/preview.js" />
         <option value="$PROJECT_DIR$/2.1/type/normal/imgcrop.js" />
         <option value="$PROJECT_DIR$/2.2/type/html5/preview.js" />
@@ -101,6 +99,7 @@
         <option value="$PROJECT_DIR$/abc.json" />
         <option value="$PROJECT_DIR$/2.2/demo/index.html" />
         <option value="$PROJECT_DIR$/2.1/demo/index.html" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -364,13 +363,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="19" selection-start="216" selection-end="216" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="510">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/abc.json">
       <provider selected="true" editor-type-id="text-editor">
         <state line="7" column="0" selection-start="250" selection-end="250" vertical-scroll-proportion="-4.576923" vertical-offset="0" max-vertical-offset="221">
@@ -387,7 +379,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/2.1/demo/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="82" column="34" selection-start="1621" selection-end="1621" vertical-scroll-proportion="0.14871016" vertical-offset="1296" max-vertical-offset="2057">
+        <state line="82" column="34" selection-start="1621" selection-end="1621" vertical-scroll-proportion="-41.03846" vertical-offset="327" max-vertical-offset="2057">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="0" selection-start="196" selection-end="196" vertical-scroll-proportion="0.32262772" vertical-offset="0" max-vertical-offset="685">
           <folding />
         </state>
       </provider>
