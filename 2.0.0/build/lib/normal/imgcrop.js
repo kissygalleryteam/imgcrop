@@ -79,12 +79,12 @@ module.exports = Base.extend({
       _el.all(".cubes-lb").css({
         left: -4,
         bottom: -4,
-        cursor: 'ne-resize'
+        cursor: 'sw-resize'
       });
       _el.all(".cubes-rb").css({
         right: -4,
         bottom: -4,
-        cursor: 'nw-resize'
+        cursor: 'se-resize'
       });
       _el.all(".cubes-t").hide();
     }

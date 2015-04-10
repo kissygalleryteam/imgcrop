@@ -82,7 +82,7 @@ gulp.task('kmc', function() {
   renderKmc(['index']);
 });
 
-gulp.task('mini-css', function() {
+gulp.task('mini-css', ['less'], function() {
   return gulp.src([src + '/**/*.css', '!./node_modules/**/*.css', '!./build/**/*.css'])
     .pipe(gulp.dest(dest))
     .pipe(css({
@@ -94,10 +94,10 @@ gulp.task('mini-css', function() {
 gulp.task('less', function() {
   return gulp.src([src + '/**/*.less', '!./node_modules/**/*.less'])
     .pipe(less())
-    .pipe(gulp.dest(dest));
+    .pipe(gulp.dest(src));
 });
 
-gulp.task('css', ['less', 'mini-css']);
+gulp.task('css', ['mini-css']);
 
 
 gulp.task('xtpl', function() {
