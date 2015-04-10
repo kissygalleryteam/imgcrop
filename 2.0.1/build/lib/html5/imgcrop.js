@@ -1,4 +1,4 @@
-KISSY.add('kg/imgcrop/2.0.0/lib/html5/imgcrop',["./preview","./selection","base","node"],function(S ,require, exports, module) {
+KISSY.add('kg/imgcrop/2.0.1/lib/html5/imgcrop',["./preview","./selection","base","node"],function(S ,require, exports, module) {
  /**
  * @ImgCrop 图像剪裁组件，基于canvas
  * @author 元泉 2013-5-8

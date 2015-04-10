@@ -1,4 +1,4 @@
-KISSY.add('kg/imgcrop/2.0.0/lib/html5/selection',["base"],function(S ,require, exports, module) {
+KISSY.add('kg/imgcrop/2.0.1/lib/html5/selection',["base"],function(S ,require, exports, module) {
  /**
  * @Selection 图像选择模块
  * @author 元泉 2013-8-17

@@ -1,4 +1,4 @@
-KISSY.add('kg/imgcrop/2.0.0/lib/normal/imgcrop',["./resizable","./dragable","node","base","event","dom","json"],function(S ,require, exports, module) {
+KISSY.add('kg/imgcrop/2.0.1/lib/normal/imgcrop',["./resizable","./dragable","node","base","event","dom","json"],function(S ,require, exports, module) {
  /**
  * 图片剪裁组件
  * author 元泉

@@ -1,4 +1,4 @@
-KISSY.add('kg/imgcrop/2.0.0/lib/normal/dragable',["event","dom","ua"],function(S ,require, exports, module) {
+KISSY.add('kg/imgcrop/2.0.1/lib/normal/dragable',["event","dom","ua"],function(S ,require, exports, module) {
  /**
  *拖拽组件
  */

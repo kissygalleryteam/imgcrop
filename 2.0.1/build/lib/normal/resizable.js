@@ -1,4 +1,4 @@
-KISSY.add('kg/imgcrop/2.0.0/lib/normal/resizable',["event","dom"],function(S ,require, exports, module) {
+KISSY.add('kg/imgcrop/2.0.1/lib/normal/resizable',["event","dom"],function(S ,require, exports, module) {
  /**
  * resize组件
  */
