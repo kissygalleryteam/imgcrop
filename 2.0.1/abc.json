@@ -1,0 +1,9 @@
+{
+    "name": "imgcrop",
+    "type": "kpm",
+    "kissy":"6.0.0",
+    "builder": "@ali/builder-kpm",
+    "options": {
+
+    }
+}
