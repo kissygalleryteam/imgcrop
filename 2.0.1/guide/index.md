@@ -1,7 +1,7 @@
 
 ## 初始化组件
     
-    S.use('kg/imgcrop/2.0.0/index', function (S, Imgcrop) {
+    S.use('kg/imgcrop/2.0.1/index', function (S, Imgcrop) {
          var imgcrop = new Imgcrop();
     })
 
