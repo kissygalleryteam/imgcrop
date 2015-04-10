@@ -10,7 +10,7 @@ function Resize() {
   this.initialize.apply(this, arguments);
 }
 
-S.augment(Resize, {
+Resize.prototype = {
   //缩放对象
   initialize: function(obj, options) {
     var self = this;
@@ -334,7 +334,8 @@ S.augment(Resize, {
       return true;
     }
   }
-});
+}
+
 module.exports = Resize;
 
 });

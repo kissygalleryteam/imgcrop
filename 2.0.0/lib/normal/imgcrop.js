@@ -13,7 +13,6 @@ var Event = require('event');
 var DOM = require('dom');
 var JSON = require('json');
 
-
 module.exports = Base.extend({
   initializer: function() {
 

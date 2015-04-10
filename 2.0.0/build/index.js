@@ -6,4 +6,6 @@ var Imgcrop = 'getContext' in document.createElement('canvas') ? ImgCropCanvas :
 
 module.exports = Imgcrop;
 
+module.exports.CanvasCrop = ImgCropCanvas;
+module.exports.Crop = ImgCropNormal;
 });

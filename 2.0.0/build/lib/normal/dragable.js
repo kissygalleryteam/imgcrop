@@ -2,7 +2,7 @@ KISSY.add('kg/imgcrop/2.0.0/lib/normal/dragable',["event","dom","ua"],function(S
  /**
  *拖拽组件
  */
-
+'use strict';
 var Event = require('event');
 var DOM = require('dom');
 var ie = require('ua').ie;
@@ -11,7 +11,7 @@ function Drag() {
   this.initialize.apply(this, arguments);
 }
 
-S.augment(Drag, {
+Drag.prototype = {
   //拖放对象
   initialize: function(drag, options) {
     this.Drag = DOM.get(drag); //拖放对象
@@ -134,7 +134,8 @@ S.augment(Drag, {
     //附加程序
     this.options.onmove(e);
   }
-});
+}
+
 module.exports = Drag;
 
 });
