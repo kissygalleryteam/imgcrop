@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <title>Imgcrop的demo</title>
-  <script src="//g.alicdn.com/kissy/k/1.4.2/seed.js" charset="utf-8"></script>
+  <script src="//g.alicdn.com/kissy/k/1.4.8/seed-min.js" charset="utf-8"></script>
   <style>
   *{padding: 0; margin: 0;}
   body {
@@ -64,6 +64,14 @@
         path: debugPath,
         charset: "utf-8",
         ignorePackageNameInUri: true
+      }]
+    });
+  }else{
+    S.config({
+      packages: [{
+        name: "kg",
+        path: '//g-assets.daily.taobao.net',
+        charset: "utf-8"
       }]
     });
   }
