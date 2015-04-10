@@ -24,7 +24,7 @@ ImgCrop是一个对图片进行裁剪时选取坐标和尺寸的组件。
 ### 1.加载ImgCrop模块,初始化ImgCrop
 
 ```javascript
-KISSY.use('gallery/imgcrop/2.0/index', function (S, ImgCrop) {
+KISSY.use('kg/imgcrop/2.0.0/index', function (S, ImgCrop) {
   var crop = new ImgCrop({
     areaEl : "#J_CropBox", //图片的容器
     areaWidth : 500, //不配置默认取容器宽度
