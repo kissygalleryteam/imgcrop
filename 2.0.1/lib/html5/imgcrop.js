@@ -481,6 +481,10 @@ module.exports = Base.extend({
    * @param h
    */
   setCropCoords: function(x, y, w, h) {
+    x = parseInt(x);
+    y = parseInt(y);
+    w = parseInt(w);
+    h = parseInt(h);
     this.set({
       initialXY: [x, y],
       initWidth: w,
